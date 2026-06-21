@@ -185,7 +185,7 @@ export default function Edit({ settings }: SettingsProps) {
     return (
         <AuthenticatedLayout>
             <Head title="System Settings" />
-            <div className="max-w-5xl space-y-6">
+            <div className="max-w-5xl mx-auto space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
