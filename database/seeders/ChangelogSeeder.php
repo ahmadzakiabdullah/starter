@@ -93,5 +93,18 @@ class ChangelogSeeder extends Seeder
                 ['type' => 'Added', 'content' => 'Chronological timeline layout visualization cards.'],
             ],
         ]);
+
+        Changelog::create([
+            'version' => 'v1.6.0',
+            'title' => 'Authentication Module Polish',
+            'description' => 'Polished the guest authentication screens (Login and Register) with premium glassmorphism layouts, glowing backdrop effects, double password visibility toggles, and social login buttons.',
+            'release_date' => '2026-06-21',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'Double password visibility show/hide toggles in register and login forms.'],
+                ['type' => 'Added', 'content' => 'Social sign-in grid layout placeholders for Google and GitHub accounts.'],
+                ['type' => 'Improved', 'content' => 'Upgraded GuestLayout with glassmorphic cards and soft glowing background blur blobs.'],
+            ],
+        ]);
     }
 }
