@@ -23,19 +23,20 @@ This document serves as the primary reference map for AI agents and developers w
 ## 📁 Core Codebase Directory Structure
 
 ### 1. Backend (PHP / Laravel)
-- **[routes/web.php](file:///d:/www/laravel/routes/web.php):** Web routing definitions mapping requests to Inertia page renders.
-- **[app/Http/Controllers/](file:///d:/www/laravel/app/Http/Controllers/):** Laravel controllers processing business logic and returning `Inertia::render()`.
-- **[app/Models/](file:///d:/www/laravel/app/Models/):** Eloquent models representing database tables.
+- **[routes/web.php](file:///d:/www/laravel/routes/web.php):** Web routing definitions mapping requests to Inertia page renders (includes `/dashboard/media` routes).
+- **[app/Http/Controllers/](file:///d:/www/laravel/app/Http/Controllers/):** Laravel controllers processing business logic (e.g. `MediaController.php` processing file operations).
+- **[app/Models/](file:///d:/www/laravel/app/Models/):** Eloquent models representing database tables (e.g. `Media.php` with URL and size formatting accessors).
 - **[database/migrations/](file:///d:/www/laravel/database/migrations/):** Table schema migration definitions.
-- **[database/seeders/](file:///d:/www/laravel/database/seeders/DatabaseSeeder.php):** Seeder definitions for initial user and role setups.
+- **[database/seeders/](file:///d:/www/laravel/database/seeders/DatabaseSeeder.php):** Seeder definitions for initial user, role, and changelog setups.
 
 ### 2. Frontend (TypeScript / React)
 - **[resources/views/app.blade.php](file:///d:/www/laravel/resources/views/app.blade.php):** Blade entry layout loading Google Fonts and executing Vite client injections.
 - **[resources/js/app.tsx](file:///d:/www/laravel/resources/js/app.tsx):** Frontend entry bootstrap setting up the Inertia App, next-themes, and theme customizers.
-- **[resources/js/Pages/](file:///d:/www/laravel/resources/js/Pages/):** Page-level views rendered by controllers (e.g., `Dashboard.tsx`, `Auth/Login.tsx`).
+- **[resources/js/Pages/](file:///d:/www/laravel/resources/js/Pages/):** Page-level views rendered by controllers (e.g., `Dashboard.tsx`, `Admin/Media/Index.tsx` for media manager, `Admin/Settings/Edit.tsx`).
 - **[resources/js/Components/](file:///d:/www/laravel/resources/js/Components/):** Reusable component layouts.
   - **[Components/ui/](file:///d:/www/laravel/resources/js/Components/ui/):** Raw Shadcn UI components.
   - **[Components/layout/](file:///d:/www/laravel/resources/js/Components/layout/):** Shell structural components (Sidebar, Header, Search).
+  - **[Components/media/MediaSelector.tsx](file:///d:/www/laravel/resources/js/Components/media/MediaSelector.tsx):** Reusable modal selector dialog for picking media assets in forms.
 - **[resources/js/lib/utils.ts](file:///d:/www/laravel/resources/js/lib/utils.ts):** Helper utilities (`cn` class merger and avatar helpers).
 - **[resources/css/app.css](file:///d:/www/laravel/resources/css/app.css):** Global styles loading Tailwind v4, custom theme variables, and Radix animation layers.
 
@@ -61,6 +62,18 @@ Handles user active session states:
 - `user_agent` (Text, Nullable)
 - `payload` (LongText)
 - `last_activity` (Integer, Index)
+
+### 3. `media` Table
+Stores uploaded file metadata:
+- `id` (BigInt, Primary Key, Auto-Increment)
+- `name` (String) - Original filename
+- `file_name` (String) - Hashed unique disk filename
+- `mime_type` (String) - Asset MIME type (e.g. `image/png`)
+- `path` (String) - File storage path (e.g. `media/file.png`)
+- `size` (BigInt) - File size in bytes
+- `folder` (String, Nullable) - Virtual folder name
+- `disk` (String) - Disk storage type (default: `public`)
+- `timestamps` (`created_at`, `updated_at`)
 
 ---
 

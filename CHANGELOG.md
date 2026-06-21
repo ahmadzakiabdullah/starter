@@ -13,6 +13,15 @@ All notable changes to this Laravel + Inertia (React + TypeScript) project will 
 - **System Settings Integration**: Added "Select from Library" actions to branding file input pickers, allowing admins to pick system logos and favicons directly from the media library database.
 - **Bulk Delete Operations**: Enabled checkboxes for files and a bulk delete button to clear multiple assets in a single batch.
 
+### Improved
+- **Accordion Changelogs UI**: Refactored the System Versioning & Changelog timeline list to collapse older releases inside Radix Accordions, improving visual clarity and reducing required scrolling space.
+- **Settings Page Centering & Action Bar**: Added container centering (`mx-auto`) to the Settings edit view and relocated the "Save Settings" submit button to the top-right header section.
+
+### Fixed
+- **Recharts Container Warnings**: Wrapped the Recharts ResponsiveContainer in an `isMounted` hook check and specified `width`, `height`, and `minWidth` attributes to eliminate dimension computation warnings on client page hydration.
+- **Dashboard Avatar 404 Errors**: Replaced non-existent local avatar paths (`/images/avatars/*.png`) inside the chat widget and team members modules with active, stable public profile generation URLs from the Dicebear API.
+- **Media Router Collision**: Fixed an issue where the Inertia link calls to `/dashboard/media` returned raw JSON by verifying the `X-Inertia` request header context.
+
 ## [1.9.0] - 2026-06-21
 
 ### Added
