@@ -44,7 +44,7 @@ class MediaController extends Controller
 
         $files = $query->get();
 
-        if ($request->wantsJson() || $request->ajax()) {
+        if ($request->wantsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'files' => $files,
                 'folders' => $folders,
