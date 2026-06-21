@@ -57,6 +57,13 @@ interface SettingsProps {
         app_logo_icon?: string;
         app_logo_image?: string;
         app_favicon?: string;
+        // Feature flag additions
+        module_notifications?: boolean;
+        module_active_sessions?: boolean;
+        module_theme_presets?: boolean;
+        module_announcements?: boolean;
+        module_telemetry?: boolean;
+        module_api_keys?: boolean;
     };
     announcements: Announcement[];
 }
@@ -112,6 +119,13 @@ export default function Edit({ settings, announcements }: SettingsProps) {
         app_favicon_url: settings.app_favicon ?? '',
         app_logo_file: null as File | null,
         app_favicon_file: null as File | null,
+        // Module management
+        module_notifications: !!settings.module_notifications,
+        module_active_sessions: !!settings.module_active_sessions,
+        module_theme_presets: !!settings.module_theme_presets,
+        module_announcements: !!settings.module_announcements,
+        module_telemetry: !!settings.module_telemetry,
+        module_api_keys: !!settings.module_api_keys,
         _method: 'PATCH',
     });
 
@@ -233,7 +247,7 @@ export default function Edit({ settings, announcements }: SettingsProps) {
 
                 <form id="settings-form" onSubmit={submit} className="space-y-6">
                     <Tabs defaultValue="general" className="w-full">
-                        <TabsList className="bg-muted/80 grid grid-cols-2 sm:grid-cols-3 md:flex md:w-auto items-center justify-start gap-1 p-1 h-auto mb-6">
+                        <TabsList className="bg-muted/80 grid grid-cols-2 sm:grid-cols-3 md:flex md:w-auto items-center justify-start gap-1 p-1 h-auto mb-6 flex-wrap">
                             <TabsTrigger value="general" className="flex items-center gap-2 py-2.5 px-4">
                                 <Settings className="h-4 w-4" />
                                 General
@@ -254,10 +268,16 @@ export default function Edit({ settings, announcements }: SettingsProps) {
                                 <Wrench className="h-4 w-4" />
                                 System & Maintenance
                             </TabsTrigger>
-                            <TabsTrigger value="announcements" className="flex items-center gap-2 py-2.5 px-4">
-                                <LucideIcons.Megaphone className="h-4 w-4" />
-                                Broadcast Banners
+                            <TabsTrigger value="modules" className="flex items-center gap-2 py-2.5 px-4">
+                                <LucideIcons.Layers className="h-4 w-4" />
+                                Feature Modules
                             </TabsTrigger>
+                            {data.module_announcements && (
+                                <TabsTrigger value="announcements" className="flex items-center gap-2 py-2.5 px-4">
+                                    <LucideIcons.Megaphone className="h-4 w-4" />
+                                    Broadcast Banners
+                                </TabsTrigger>
+                            )}
                         </TabsList>
 
                         {/* GENERAL TAB */}
@@ -779,11 +799,152 @@ export default function Edit({ settings, announcements }: SettingsProps) {
                                 </CardContent>
                             </Card>
                         </TabsContent>
+                        {/* FEATURE MODULES TAB */}
+                        <TabsContent value="modules" className="space-y-6 outline-none animate-in fade-in duration-200">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <LucideIcons.Layers className="h-5 w-5 text-primary" />
+                                        Feature Modules Controls
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Enable or disable optional system modules dynamically. Disabling a module hides its UI elements from the portal and blocks access to its controller endpoints.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="pt-6 space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        
+                                        {/* Notifications Module */}
+                                        <div className="flex items-start justify-between rounded-xl border p-4 bg-muted/10 hover:bg-muted/20 transition duration-200">
+                                            <div className="flex gap-3">
+                                                <div className="h-10 w-10 shrink-0 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                                                    <LucideIcons.Bell className="h-5 w-5" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="module_notifications" className="text-sm font-bold block cursor-pointer">Real-time Notifications</Label>
+                                                    <span className="text-xs text-muted-foreground leading-relaxed block font-normal">
+                                                        Allows users to receive system alerts, broadcast logs, and in-app bell notifications.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Switch 
+                                                id="module_notifications" 
+                                                checked={data.module_notifications} 
+                                                onCheckedChange={(checked) => setData('module_notifications', checked)} 
+                                            />
+                                        </div>
+
+                                        {/* Active Sessions Monitor */}
+                                        <div className="flex items-start justify-between rounded-xl border p-4 bg-muted/10 hover:bg-muted/20 transition duration-200">
+                                            <div className="flex gap-3">
+                                                <div className="h-10 w-10 shrink-0 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                                                    <LucideIcons.Laptop className="h-5 w-5" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="module_active_sessions" className="text-sm font-bold block cursor-pointer">Active Device & Sessions</Label>
+                                                    <span className="text-xs text-muted-foreground leading-relaxed block font-normal">
+                                                        Allows users to view, track, and force logout individual active sessions or device locations.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Switch 
+                                                id="module_active_sessions" 
+                                                checked={data.module_active_sessions} 
+                                                onCheckedChange={(checked) => setData('module_active_sessions', checked)} 
+                                            />
+                                        </div>
+
+                                        {/* Multi-theme Presets */}
+                                        <div className="flex items-start justify-between rounded-xl border p-4 bg-muted/10 hover:bg-muted/20 transition duration-200">
+                                            <div className="flex gap-3">
+                                                <div className="h-10 w-10 shrink-0 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
+                                                    <LucideIcons.Palette className="h-5 w-5" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="module_theme_presets" className="text-sm font-bold block cursor-pointer">Multi-Theme Presets</Label>
+                                                    <span className="text-xs text-muted-foreground leading-relaxed block font-normal">
+                                                        Enables custom theme presets (zinc, orange, blue, green, etc.) inside the header color switcher.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Switch 
+                                                id="module_theme_presets" 
+                                                checked={data.module_theme_presets} 
+                                                onCheckedChange={(checked) => setData('module_theme_presets', checked)} 
+                                            />
+                                        </div>
+
+                                        {/* Global Announcement Banners */}
+                                        <div className="flex items-start justify-between rounded-xl border p-4 bg-muted/10 hover:bg-muted/20 transition duration-200">
+                                            <div className="flex gap-3">
+                                                <div className="h-10 w-10 shrink-0 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+                                                    <LucideIcons.Megaphone className="h-5 w-5" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="module_announcements" className="text-sm font-bold block cursor-pointer">Broadcast Banners</Label>
+                                                    <span className="text-xs text-muted-foreground leading-relaxed block font-normal">
+                                                        Enables the admin broadcast banner system to display global alert ribbons on all pages.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Switch 
+                                                id="module_announcements" 
+                                                checked={data.module_announcements} 
+                                                onCheckedChange={(checked) => setData('module_announcements', checked)} 
+                                            />
+                                        </div>
+
+                                        {/* Live Telemetry Charts */}
+                                        <div className="flex items-start justify-between rounded-xl border p-4 bg-muted/10 hover:bg-muted/20 transition duration-200">
+                                            <div className="flex gap-3">
+                                                <div className="h-10 w-10 shrink-0 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                                    <LucideIcons.Cpu className="h-5 w-5" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="module_telemetry" className="text-sm font-bold block cursor-pointer">Live Telemetry Widget</Label>
+                                                    <span className="text-xs text-muted-foreground leading-relaxed block font-normal">
+                                                        Switches CPU and memory monitor widget to render real-time interactive Area charts.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Switch 
+                                                id="module_telemetry" 
+                                                checked={data.module_telemetry} 
+                                                onCheckedChange={(checked) => setData('module_telemetry', checked)} 
+                                            />
+                                        </div>
+
+                                        {/* API Access Keys Manager */}
+                                        <div className="flex items-start justify-between rounded-xl border p-4 bg-muted/10 hover:bg-muted/20 transition duration-200">
+                                            <div className="flex gap-3">
+                                                <div className="h-10 w-10 shrink-0 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-500">
+                                                    <LucideIcons.Key className="h-5 w-5" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label htmlFor="module_api_keys" className="text-sm font-bold block cursor-pointer">API Access Tokens</Label>
+                                                    <span className="text-xs text-muted-foreground leading-relaxed block font-normal">
+                                                        Allows users to create and manage personal access tokens (Sanctum keys) for API auth.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Switch 
+                                                id="module_api_keys" 
+                                                checked={data.module_api_keys} 
+                                                onCheckedChange={(checked) => setData('module_api_keys', checked)} 
+                                            />
+                                        </div>
+
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
 
                         {/* ANNOUNCEMENTS TAB */}
-                        <TabsContent value="announcements" className="space-y-6 outline-none">
-                            <AnnouncementSettings announcements={announcements} />
-                        </TabsContent>
+                        {data.module_announcements && (
+                            <TabsContent value="announcements" className="space-y-6 outline-none">
+                                <AnnouncementSettings announcements={announcements} />
+                            </TabsContent>
+                        )}
                     </Tabs>
 
                 </form>

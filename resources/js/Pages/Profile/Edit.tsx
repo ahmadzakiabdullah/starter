@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, Link, router } from '@inertiajs/react';
+import { Head, useForm, Link, router, usePage } from '@inertiajs/react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { 
@@ -100,7 +100,10 @@ export default function Edit({
         });
     };
 
-
+    const { props: pageProps } = usePage();
+    const system = pageProps.system as any;
+    const showSessions = system?.module_active_sessions !== false;
+    const showApiKeys = system?.module_api_keys !== false;
 
     return (
         <AuthenticatedLayout>
@@ -128,14 +131,18 @@ export default function Edit({
                             <ShieldCheck className="h-4 w-4" />
                             Two-Factor Auth
                         </TabsTrigger>
-                        <TabsTrigger value="sessions" className="flex items-center gap-1.5 text-xs py-2 px-4 rounded">
-                            <Laptop className="h-4 w-4" />
-                            Active Devices
-                        </TabsTrigger>
-                        <TabsTrigger value="api-tokens" className="flex items-center gap-1.5 text-xs py-2 px-4 rounded">
-                            <Key className="h-4 w-4" />
-                            API Access Keys
-                        </TabsTrigger>
+                        {showSessions && (
+                            <TabsTrigger value="sessions" className="flex items-center gap-1.5 text-xs py-2 px-4 rounded">
+                                <Laptop className="h-4 w-4" />
+                                Active Devices
+                            </TabsTrigger>
+                        )}
+                        {showApiKeys && (
+                            <TabsTrigger value="api-tokens" className="flex items-center gap-1.5 text-xs py-2 px-4 rounded">
+                                <Key className="h-4 w-4" />
+                                API Access Keys
+                            </TabsTrigger>
+                        )}
                     </TabsList>
 
                     {/* GENERAL DETAILS TAB */}
@@ -260,14 +267,18 @@ export default function Edit({
                     </TabsContent>
 
                     {/* ACTIVE DEVICES SESSIONS TAB */}
-                    <TabsContent value="sessions">
-                        <SessionsManager />
-                    </TabsContent>
+                    {showSessions && (
+                        <TabsContent value="sessions">
+                            <SessionsManager />
+                        </TabsContent>
+                    )}
 
                     {/* API ACCESS KEYS TAB */}
-                    <TabsContent value="api-tokens">
-                        <ApiTokenManager />
-                    </TabsContent>
+                    {showApiKeys && (
+                        <TabsContent value="api-tokens">
+                            <ApiTokenManager />
+                        </TabsContent>
+                    )}
                 </Tabs>
             </div>
 

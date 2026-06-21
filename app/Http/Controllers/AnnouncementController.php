@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            abort_unless(\App\Models\Setting::values()['module_announcements'] ?? true, 403, 'Announcement module is disabled.');
+            return $next($request);
+        });
+    }
+
     /**
      * Store a newly created announcement in storage.
      */

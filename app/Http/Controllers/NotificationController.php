@@ -9,6 +9,14 @@ use Inertia\Response;
 
 class NotificationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            abort_unless(\App\Models\Setting::values()['module_notifications'] ?? true, 403, 'Notification module is disabled.');
+            return $next($request);
+        });
+    }
+
     public function index(Request $request): Response
     {
         return Inertia::render('Notifications/Index', [

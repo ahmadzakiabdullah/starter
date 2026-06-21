@@ -47,6 +47,14 @@ class SystemSettingsController extends Controller
             'min_password_length' => 'required|integer|min:4|max:32',
             'session_lifetime' => 'required|integer|min:1|max:1440',
 
+            // Feature Modules Toggles
+            'module_notifications' => 'required|boolean',
+            'module_active_sessions' => 'required|boolean',
+            'module_theme_presets' => 'required|boolean',
+            'module_announcements' => 'required|boolean',
+            'module_telemetry' => 'required|boolean',
+            'module_api_keys' => 'required|boolean',
+
             // SMTP
             'mail_driver' => 'required|in:log,smtp',
             'mail_host' => 'nullable|required_if:mail_driver,smtp|string',

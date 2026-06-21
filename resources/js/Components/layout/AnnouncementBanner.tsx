@@ -17,11 +17,11 @@ interface Announcement {
 }
 
 export default function AnnouncementBanner() {
-    const { active_announcement } = usePage().props as any;
+    const { active_announcement, system } = usePage().props as any;
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
-        if (active_announcement) {
+        if (active_announcement && system?.module_announcements !== false) {
             const dismissed = sessionStorage.getItem(`dismissed_announcement_${active_announcement.id}`);
             if (!dismissed) {
                 setVisible(true);
@@ -29,9 +29,9 @@ export default function AnnouncementBanner() {
         } else {
             setVisible(false);
         }
-    }, [active_announcement]);
+    }, [active_announcement, system]);
 
-    if (!active_announcement || !visible) {
+    if (!active_announcement || !visible || system?.module_announcements === false) {
         return null;
     }
 

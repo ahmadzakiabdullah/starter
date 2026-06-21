@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Cpu, HardDrive, Sparkles, RefreshCw, Layers } from 'lucide-react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { Badge } from '@/Components/ui/badge';
 import { 
@@ -37,6 +37,9 @@ interface ChartData {
 export default function TelemetryWidget({ telemetry }: TelemetryProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataHistory, setDataHistory] = useState<ChartData[]>([]);
+    const { props: pageProps } = usePage();
+    const system = pageProps.system as any;
+    const showChart = system?.module_telemetry !== false;
 
     useEffect(() => {
         // Initialize with 10 historical points leading to the current load values
@@ -125,90 +128,131 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
                 <CardDescription className="text-xs">Dynamic CPU & Memory load tracking logs</CardDescription>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
-                
                 {/* DUAL LINE CHART */}
-                <div className="h-40 w-full text-xs font-mono">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={dataHistory} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                            <defs>
-                                <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.25}/>
-                                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.02}/>
-                                </linearGradient>
-                                <linearGradient id="colorRam" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.25}/>
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.02}/>
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" className="dark:stroke-slate-800/50" />
-                            <XAxis 
-                                dataKey="time" 
-                                tickLine={false} 
-                                axisLine={false} 
-                                tick={{ fontSize: 9 }}
-                            />
-                            <YAxis 
-                                domain={[0, 100]} 
-                                tickLine={false} 
-                                axisLine={false}
-                                tick={{ fontSize: 9 }}
-                            />
-                            <Tooltip 
-                                contentStyle={{
-                                    backgroundColor: 'oklch(var(--popover))',
-                                    borderRadius: '8px',
-                                    border: '1px solid oklch(var(--border))',
-                                    color: 'oklch(var(--popover-foreground))',
-                                    fontSize: '11px',
-                                }}
-                            />
-                            <Area 
-                                type="monotone" 
-                                dataKey="cpu" 
-                                name="CPU (%)"
-                                stroke="#4f46e5" 
-                                strokeWidth={2}
-                                fillOpacity={1} 
-                                fill="url(#colorCpu)" 
-                                activeDot={{ r: 4 }}
-                                isAnimationActive={false}
-                            />
-                            <Area 
-                                type="monotone" 
-                                dataKey="ram" 
-                                name="RAM (%)"
-                                stroke="#10b981" 
-                                strokeWidth={2}
-                                fillOpacity={1} 
-                                fill="url(#colorRam)" 
-                                activeDot={{ r: 4 }}
-                                isAnimationActive={false}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
+                {showChart && (
+                    <div className="h-40 w-full text-xs font-mono">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={dataHistory} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.25}/>
+                                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.02}/>
+                                    </linearGradient>
+                                    <linearGradient id="colorRam" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.25}/>
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.02}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" className="dark:stroke-slate-800/50" />
+                                <XAxis 
+                                    dataKey="time" 
+                                    tickLine={false} 
+                                    axisLine={false} 
+                                    tick={{ fontSize: 9 }}
+                                />
+                                <YAxis 
+                                    domain={[0, 100]} 
+                                    tickLine={false} 
+                                    axisLine={false}
+                                    tick={{ fontSize: 9 }}
+                                />
+                                <Tooltip 
+                                    contentStyle={{
+                                        backgroundColor: 'oklch(var(--popover))',
+                                        borderRadius: '8px',
+                                        border: '1px solid oklch(var(--border))',
+                                        color: 'oklch(var(--popover-foreground))',
+                                        fontSize: '11px',
+                                    }}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="cpu" 
+                                    name="CPU (%)"
+                                    stroke="#4f46e5" 
+                                    strokeWidth={2}
+                                    fillOpacity={1} 
+                                    fill="url(#colorCpu)" 
+                                    activeDot={{ r: 4 }}
+                                    isAnimationActive={false}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="ram" 
+                                    name="RAM (%)"
+                                    stroke="#10b981" 
+                                    strokeWidth={2}
+                                    fillOpacity={1} 
+                                    fill="url(#colorRam)" 
+                                    activeDot={{ r: 4 }}
+                                    isAnimationActive={false}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
 
                 {/* Progress Indicators & Text values */}
                 <div className="space-y-2.5 text-xs">
-                    {/* CPU & RAM CURRENT LABELS */}
-                    <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-900/20 p-2 border border-slate-100 dark:border-slate-800 rounded-lg">
-                        <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground flex items-center gap-1">
-                                <span className="h-2 w-2 rounded-full bg-indigo-600" /> CPU Load
-                            </span>
-                            <span className={`font-bold font-mono ${getProgressColorText(telemetry.cpu_percent)}`}>
-                                {telemetry.cpu_percent}%
-                            </span>
+                    {showChart ? (
+                        /* CPU & RAM CURRENT LABELS */
+                        <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-900/20 p-2 border border-slate-100 dark:border-slate-800 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground flex items-center gap-1">
+                                    <span className="h-2 w-2 rounded-full bg-indigo-600" /> CPU Load
+                                </span>
+                                <span className={`font-bold font-mono ${getProgressColorText(telemetry.cpu_percent)}`}>
+                                    {telemetry.cpu_percent}%
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground flex items-center gap-1">
+                                    <span className="h-2 w-2 rounded-full bg-emerald-500" /> Memory
+                                </span>
+                                <span className={`font-bold font-mono ${getProgressColorText(telemetry.ram_percent)}`}>
+                                    {telemetry.ram_percent}%
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground flex items-center gap-1">
-                                <span className="h-2 w-2 rounded-full bg-emerald-500" /> Memory
-                            </span>
-                            <span className={`font-bold font-mono ${getProgressColorText(telemetry.ram_percent)}`}>
-                                {telemetry.ram_percent}%
-                            </span>
-                        </div>
-                    </div>
+                    ) : (
+                        <>
+                            {/* CPU Progress bar */}
+                            <div className="space-y-1">
+                                <div className="flex items-center justify-between font-medium">
+                                    <span className="text-muted-foreground flex items-center gap-1.5">
+                                        <span className="h-2 w-2 rounded-full bg-indigo-600" /> CPU Load
+                                    </span>
+                                    <span className={`font-semibold font-mono ${getProgressColorText(telemetry.cpu_percent)}`}>
+                                        {telemetry.cpu_percent}%
+                                    </span>
+                                </div>
+                                <div className="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
+                                    <div 
+                                        className={`h-full bg-indigo-600 transition-all duration-500 ease-out`}
+                                        style={{ width: `${telemetry.cpu_percent}%` }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* RAM Progress bar */}
+                            <div className="space-y-1">
+                                <div className="flex items-center justify-between font-medium">
+                                    <span className="text-muted-foreground flex items-center gap-1.5">
+                                        <span className="h-2 w-2 rounded-full bg-emerald-500" /> Memory Load
+                                    </span>
+                                    <span className={`font-semibold font-mono ${getProgressColorText(telemetry.ram_percent)}`}>
+                                        {telemetry.ram_percent}%
+                                    </span>
+                                </div>
+                                <div className="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
+                                    <div 
+                                        className={`h-full bg-emerald-500 transition-all duration-500 ease-out`}
+                                        style={{ width: `${telemetry.ram_percent}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     {/* Disk Progress bar */}
                     <div className="space-y-1">

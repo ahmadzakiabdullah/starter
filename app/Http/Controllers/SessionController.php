@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Session;
 
 class SessionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            abort_unless(\App\Models\Setting::values()['module_active_sessions'] ?? true, 403, 'Active Sessions module is disabled.');
+            return $next($request);
+        });
+    }
+
     /**
      * Get active sessions for the authenticated user.
      */

@@ -37,6 +37,12 @@ class Setting extends Model
             'app_logo_icon' => 'Sparkles',
             'app_logo_image' => '',
             'app_favicon' => '',
+            'module_notifications' => true,
+            'module_active_sessions' => true,
+            'module_theme_presets' => true,
+            'module_announcements' => true,
+            'module_telemetry' => true,
+            'module_api_keys' => true,
         ];
     }
 
@@ -48,7 +54,11 @@ class Setting extends Model
             return $values;
         }
 
-        $booleans = ['email_notifications', 'enable_registration', 'maintenance_mode'];
+        $booleans = [
+            'email_notifications', 'enable_registration', 'maintenance_mode',
+            'module_notifications', 'module_active_sessions', 'module_theme_presets',
+            'module_announcements', 'module_telemetry', 'module_api_keys'
+        ];
         $integers = ['min_password_length', 'session_lifetime'];
 
         foreach (static::query()->pluck('value', 'key') as $key => $value) {

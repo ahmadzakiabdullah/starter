@@ -6,6 +6,14 @@ use Illuminate\Http\Request;
 
 class ApiTokenController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            abort_unless(\App\Models\Setting::values()['module_api_keys'] ?? true, 403, 'API Keys module is disabled.');
+            return $next($request);
+        });
+    }
+
     /**
      * Get the active API tokens for the user.
      */
