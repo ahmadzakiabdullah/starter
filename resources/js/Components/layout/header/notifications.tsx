@@ -32,7 +32,9 @@ type Notification = {
 
 const Notifications = () => {
   const isMobile = useIsMobile();
-  const { notifications } = usePage().props as unknown as { notifications: { unread_count: number; items: Notification[] } };
+  const { notifications } = usePage().props as any;
+  const unreadCount = notifications?.unread_count ?? 0;
+  const items = notifications?.items ?? [];
 
   // Contextual icon resolver matching the main index view
   const getNotificationIcon = (title: string) => {
@@ -72,7 +74,7 @@ const Notifications = () => {
       <DropdownMenuTrigger asChild>
         <Button size="icon-sm" variant="ghost" className="relative">
           <BellIcon />
-          {notifications.unread_count > 0 && <span className="bg-destructive absolute end-0.5 top-0.5 block size-1.5 shrink-0 rounded-full"></span>}
+          {unreadCount > 0 && <span className="bg-destructive absolute end-0.5 top-0.5 block size-1.5 shrink-0 rounded-full"></span>}
         </Button>
       </DropdownMenuTrigger>
 
@@ -87,9 +89,9 @@ const Notifications = () => {
         </DropdownMenuLabel>
 
         <ScrollArea className="h-[350px]">
-          {notifications.items.length === 0 ? (
+          {items.length === 0 ? (
             <div className="p-6 text-center text-xs text-muted-foreground">No notifications.</div>
-          ) : notifications.items.map((item: Notification) => {
+          ) : items.map((item: Notification) => {
             const config = getNotificationIcon(item.title);
             const IconComponent = config.icon;
 
