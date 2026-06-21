@@ -23,6 +23,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/Components/ui/accordion';
 
 interface ChangeItem {
     type: 'Added' | 'Improved' | 'Changed' | 'Fixed' | 'Removed';
@@ -227,7 +228,7 @@ export default function Index({ changelogs, canManage }: ChangelogPageProps) {
                 </div>
 
                 {/* Timeline Section */}
-                <div className="relative border-l-2 border-primary/20 ml-3 pl-6 sm:pl-8 py-2 space-y-8">
+                <div className="relative border-l-2 border-primary/20 ml-3 pl-6 sm:pl-8 py-2 space-y-6">
                     {changelogs.length === 0 ? (
                         <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-xl bg-card text-muted-foreground text-center">
                             <Info className="h-8 w-8 mb-2 text-primary opacity-60 animate-pulse" />
@@ -239,90 +240,107 @@ export default function Index({ changelogs, canManage }: ChangelogPageProps) {
                             )}
                         </div>
                     ) : (
-                        changelogs.map((log) => (
-                            <div key={log.id} className="relative group">
-                                {/* Timeline Dot */}
-                                <div className="absolute -left-[38px] sm:-left-[46px] top-1.5 flex h-6 w-6 items-center justify-center rounded-full border bg-background text-primary shadow-xs transition-colors duration-200 group-hover:border-primary group-hover:bg-primary/5">
-                                    <Tag className="h-3 w-3" />
-                                </div>
-
-                                {/* Timeline Card */}
-                                <div className="rounded-xl border bg-card p-4 sm:p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20">
-                                    <div className="flex items-start justify-between gap-4 flex-wrap sm:flex-nowrap">
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="text-lg font-bold font-mono tracking-tight text-foreground">
-                                                    {log.version}
-                                                </span>
-                                                <h3 className="text-base font-semibold text-foreground/90">
-                                                    {log.title}
-                                                </h3>
-                                                {!log.is_published && (
-                                                    <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px]">
-                                                        Draft
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                                <Calendar className="h-3.5 w-3.5" />
-                                                <span>
-                                                    {new Date(log.release_date).toLocaleDateString(undefined, { dateStyle: 'long' })}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {canManage && (
-                                            <div className="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    onClick={() => openEditModal(log)} 
-                                                    className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                                    title="Edit version"
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    onClick={() => handleDelete(log)} 
-                                                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
-                                                    title="Delete version"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        )}
+                        <Accordion
+                            type="multiple"
+                            defaultValue={changelogs.length > 0 ? [changelogs[0].id.toString()] : []}
+                            className="w-full space-y-6"
+                        >
+                            {changelogs.map((log) => (
+                                <div key={log.id} className="relative group">
+                                    {/* Timeline Dot */}
+                                    <div className="absolute -left-[38px] sm:-left-[46px] top-[18px] flex h-6 w-6 items-center justify-center rounded-full border bg-background text-primary shadow-xs transition-colors duration-200 group-hover:border-primary group-hover:bg-primary/5 z-10">
+                                        <Tag className="h-3 w-3" />
                                     </div>
 
-                                    {log.description && (
-                                        <p className="mt-3 text-xs leading-relaxed text-muted-foreground bg-muted/20 border border-muted/30 rounded-lg p-3">
-                                            {log.description}
-                                        </p>
-                                    )}
+                                    {/* Accordion Card */}
+                                    <AccordionItem
+                                        value={log.id.toString()}
+                                        className="border rounded-xl bg-card shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 overflow-hidden"
+                                    >
+                                        <AccordionTrigger className="w-full hover:no-underline px-4 sm:px-5 py-4 flex items-center justify-between text-left">
+                                            <div className="flex items-start justify-between gap-4 flex-1 pr-4">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="text-base sm:text-lg font-bold font-mono tracking-tight text-foreground">
+                                                            {log.version}
+                                                        </span>
+                                                        <h3 className="text-sm sm:text-base font-semibold text-foreground/90 leading-tight">
+                                                            {log.title}
+                                                        </h3>
+                                                        {!log.is_published && (
+                                                            <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px]">
+                                                                Draft
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                        <Calendar className="h-3.5 w-3.5" />
+                                                        <span>
+                                                            {new Date(log.release_date).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                    {/* Categorized list of changes */}
-                                    <div className="mt-4 space-y-2">
-                                        <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block border-b pb-1">
-                                            Release Notes
-                                        </h4>
-                                        <ul className="space-y-2.5 mt-2">
-                                            {log.changes && log.changes.map((item, idx) => (
-                                                <li key={idx} className="flex items-start gap-2.5 text-xs leading-relaxed">
-                                                    <Badge 
-                                                        variant="outline" 
-                                                        className={`text-[9px] px-1.5 py-0 rounded uppercase tracking-wider shrink-0 font-bold border ${getTypeStyles(item.type)}`}
+                                            {/* Action buttons (Edit/Delete) */}
+                                            {canManage && (
+                                                <div 
+                                                    className="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity mr-2"
+                                                    onClick={(e) => e.stopPropagation()} // Prevent toggling the accordion when clicking action buttons
+                                                >
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        onClick={() => openEditModal(log)} 
+                                                        className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                                        title="Edit version"
                                                     >
-                                                        {item.type}
-                                                    </Badge>
-                                                    <span className="text-foreground/80 pt-0.5">{item.content}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        onClick={() => handleDelete(log)} 
+                                                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                                                        title="Delete version"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </AccordionTrigger>
+
+                                        <AccordionContent className="p-4 sm:p-5 border-t bg-muted/5 space-y-4">
+                                            {log.description && (
+                                                <p className="text-xs leading-relaxed text-muted-foreground bg-muted/20 border border-muted/30 rounded-lg p-3">
+                                                    {log.description}
+                                                </p>
+                                            )}
+
+                                            {/* Categorized list of changes */}
+                                            <div className="space-y-2">
+                                                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block border-b pb-1">
+                                                    Release Notes
+                                                </h4>
+                                                <ul className="space-y-2.5 mt-2">
+                                                    {log.changes && log.changes.map((item, idx) => (
+                                                        <li key={idx} className="flex items-start gap-2.5 text-xs leading-relaxed">
+                                                            <Badge 
+                                                                variant="outline" 
+                                                                className={`text-[9px] px-1.5 py-0 rounded uppercase tracking-wider shrink-0 font-bold border ${getTypeStyles(item.type)}`}
+                                                            >
+                                                                {item.type}
+                                                            </Badge>
+                                                            <span className="text-foreground/80 pt-0.5">{item.content}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
                                 </div>
-                            </div>
-                        ))
+                            ))}
+                        </Accordion>
                     )}
                 </div>
             </div>
