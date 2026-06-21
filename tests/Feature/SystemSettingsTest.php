@@ -43,6 +43,12 @@ class SystemSettingsTest extends TestCase
             'maintenance_message' => 'Custom offline banner',
             'app_logo_type' => 'icon',
             'app_logo_icon' => 'Sparkles',
+            'module_notifications' => true,
+            'module_active_sessions' => true,
+            'module_theme_presets' => true,
+            'module_announcements' => true,
+            'module_telemetry' => true,
+            'module_api_keys' => true,
         ];
 
         $this->actingAs($regularUser)

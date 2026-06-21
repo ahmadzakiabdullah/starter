@@ -20,7 +20,7 @@ class UserManagementTest extends TestCase
         $user = User::factory()->create(['email_verified_at' => null]);
 
         $this->actingAs($superadmin)
-            ->patch(route('users.toggle-verification', $user->id))
+            ->patch(route('users.toggle-verification', $user))
             ->assertRedirect();
 
         $this->assertNotNull($user->refresh()->email_verified_at);
@@ -28,7 +28,7 @@ class UserManagementTest extends TestCase
 
         // Toggle back to unverified
         $this->actingAs($superadmin)
-            ->patch(route('users.toggle-verification', $user->id))
+            ->patch(route('users.toggle-verification', $user))
             ->assertRedirect();
 
         $this->assertNull($user->refresh()->email_verified_at);

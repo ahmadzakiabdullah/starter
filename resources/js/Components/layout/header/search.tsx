@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { CommandIcon, SearchIcon } from "lucide-react";
 import { Input } from "@/Components/ui/input";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 
 import {
   CommandDialog,
@@ -17,10 +17,13 @@ import {
 } from "@/Components/ui/command";
 import { Button } from "@/Components/ui/button";
 import { DialogHeader, DialogTitle } from "@/Components/ui/dialog";
-import { navItems } from "@/Components/layout/sidebar/nav-main";
+import { getNavGroups } from "@/Components/layout/sidebar/nav-main";
 
 export default function Search() {
   const [open, setOpen] = useState(false);
+  const { auth } = usePage().props as any;
+  const user = auth?.user;
+  const navGroups = getNavGroups(user);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -62,7 +65,7 @@ export default function Search() {
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          {navItems.map((route) => (
+          {navGroups.map((route) => (
             <React.Fragment key={route.title}>
               <CommandGroup heading={route.title}>
                 {route.items.map((item, key) => (
