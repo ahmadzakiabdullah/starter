@@ -41,6 +41,8 @@ class SystemSettingsTest extends TestCase
             'maintenance_mode' => true,
             'maintenance_bypass_ip' => '127.0.0.1, 192.168.1.1',
             'maintenance_message' => 'Custom offline banner',
+            'app_logo_type' => 'icon',
+            'app_logo_icon' => 'Sparkles',
         ];
 
         $this->actingAs($regularUser)

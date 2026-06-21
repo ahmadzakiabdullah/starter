@@ -135,5 +135,20 @@ class ChangelogSeeder extends Seeder
                 ['type' => 'Added', 'content' => 'OS-Aware Server Health Monitor with progress gauges checking CPU, RAM, disk, database, and Laravel caches.'],
             ],
         ]);
+
+        Changelog::create([
+            'version' => 'v1.9.0',
+            'title' => 'Dynamic Branding Customizer',
+            'description' => 'Introduced dynamic branding settings allowing administrators to customize the system logo style (Lucide preset vs uploaded custom image) and favicon directly from the settings panel, complete with an interactive real-time preview card.',
+            'release_date' => '2026-06-21',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'Dynamic favicon asset rendering directly in the browser tab from DB settings.'],
+                ['type' => 'Added', 'content' => 'Logo Style customizer choosing between 16 Lucide icon presets and custom uploaded image files.'],
+                ['type' => 'Added', 'content' => 'Sticky Real-time Branding Live Preview Panel inside system settings.'],
+                ['type' => 'Added', 'content' => 'Support for file uploads (FormData) using Inertia POST method overriding with PATCH.'],
+                ['type' => 'Improved', 'content' => 'Enhanced settings page layouts with animations, responsive visual splits, and custom icons.'],
+            ],
+        ]);
     }
 }

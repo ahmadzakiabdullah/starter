@@ -9,10 +9,12 @@ import { Switch } from '@/Components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Head, useForm, router } from '@inertiajs/react';
-import { Settings, Globe, ShieldAlert, Mail, Wrench, Loader2, Send, Trash2, RefreshCw, Server, ShieldCheck, AlertCircle } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+
+const { Settings, Globe, ShieldAlert, Mail, Wrench, Loader2, Send, Trash2, RefreshCw, Server, ShieldCheck, AlertCircle } = LucideIcons;
 
 interface SettingsProps {
     settings: {
@@ -37,6 +39,11 @@ interface SettingsProps {
         maintenance_mode: boolean;
         maintenance_bypass_ip: string;
         maintenance_message: string;
+        // Branding additions
+        app_logo_type?: string;
+        app_logo_icon?: string;
+        app_logo_image?: string;
+        app_favicon?: string;
     };
 }
 
@@ -55,14 +62,72 @@ const COMMON_TIMEZONES = [
     "Australia/Sydney"
 ];
 
+const PRESET_ICONS = [
+    'Sparkles', 'Activity', 'Shield', 'Layers', 'Terminal', 'Code2', 
+    'Cpu', 'Briefcase', 'Compass', 'Globe', 'Database', 'Bookmark',
+    'Flame', 'Zap', 'Workflow', 'Heart'
+];
+
 export default function Edit({ settings }: SettingsProps) {
-    const { data, setData, patch, processing, errors } = useForm(settings);
+    const { data, setData, post, processing, errors } = useForm({
+        app_name: settings.app_name ?? '',
+        app_description: settings.app_description ?? '',
+        timezone: settings.timezone ?? 'Asia/Kuala_Lumpur',
+        date_format: settings.date_format ?? 'Y-m-d',
+        default_theme: settings.default_theme ?? 'system',
+        default_language: settings.default_language ?? 'en',
+        email_notifications: !!settings.email_notifications,
+        enable_registration: !!settings.enable_registration,
+        min_password_length: settings.min_password_length ?? 8,
+        session_lifetime: settings.session_lifetime ?? 120,
+        mail_driver: settings.mail_driver ?? 'log',
+        mail_host: settings.mail_host ?? '',
+        mail_port: settings.mail_port ?? '',
+        mail_username: settings.mail_username ?? '',
+        mail_password: settings.mail_password ?? '',
+        mail_encryption: settings.mail_encryption ?? 'tls',
+        mail_from_address: settings.mail_from_address ?? '',
+        mail_from_name: settings.mail_from_name ?? '',
+        maintenance_mode: !!settings.maintenance_mode,
+        maintenance_bypass_ip: settings.maintenance_bypass_ip ?? '',
+        maintenance_message: settings.maintenance_message ?? '',
+        // Branding additions
+        app_logo_type: settings.app_logo_type ?? 'icon',
+        app_logo_icon: settings.app_logo_icon ?? 'Sparkles',
+        app_logo_image_url: settings.app_logo_image ?? '',
+        app_favicon_url: settings.app_favicon ?? '',
+        app_logo_file: null as File | null,
+        app_favicon_file: null as File | null,
+        _method: 'PATCH',
+    });
+
     const [testingSmtp, setTestingSmtp] = useState(false);
     const [clearingCache, setClearingCache] = useState<string | null>(null);
 
+    // Dynamic Visual Previews local state
+    const [logoPreview, setLogoPreview] = useState<string | null>(settings.app_logo_image || null);
+    const [faviconPreview, setFaviconPreview] = useState<string | null>(settings.app_favicon || null);
+
+    const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('app_logo_file', file);
+            setLogoPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleFaviconFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('app_favicon_file', file);
+            setFaviconPreview(URL.createObjectURL(file));
+        }
+    };
+
     const submit = (event: React.FormEvent) => {
         event.preventDefault();
-        patch(route('settings.update'), {
+        post(route('settings.update'), {
+            forceFormData: true,
             onSuccess: () => {
                 toast.success('System settings saved successfully.');
             },
@@ -159,39 +224,249 @@ export default function Edit({ settings }: SettingsProps) {
                         </TabsList>
 
                         {/* GENERAL TAB */}
-                        <TabsContent value="general" className="space-y-6 outline-none">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>General Branding</CardTitle>
-                                    <CardDescription>Customize the application identifier and visual theme preset.</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-6">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="app_name">Application Name</Label>
-                                        <Input id="app_name" value={data.app_name} onChange={(event) => setData('app_name', event.target.value)} />
-                                        <InputError message={errors.app_name} />
-                                    </div>
+                        <TabsContent value="general" className="space-y-6 outline-none animate-in fade-in duration-200">
+                            <div className="grid gap-6 lg:grid-cols-3">
+                                {/* Left column: Settings inputs */}
+                                <div className="lg:col-span-2 space-y-6">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Branding & Details</CardTitle>
+                                            <CardDescription>Customize the application identity and primary metadata.</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="app_name">Application Name</Label>
+                                                <Input id="app_name" value={data.app_name} onChange={(event) => setData('app_name', event.target.value)} />
+                                                <InputError message={errors.app_name} />
+                                            </div>
 
-                                    <div className="space-y-2">
-                                        <Label htmlFor="app_description">Application Description</Label>
-                                        <Textarea id="app_description" value={data.app_description} onChange={(event) => setData('app_description', event.target.value)} />
-                                        <InputError message={errors.app_description} />
-                                    </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="app_description">Application Description</Label>
+                                                <Textarea id="app_description" value={data.app_description} onChange={(event) => setData('app_description', event.target.value)} />
+                                                <InputError message={errors.app_description} />
+                                            </div>
 
-                                    <div className="space-y-2">
-                                        <Label htmlFor="default_theme">Default Theme Preset</Label>
-                                        <Select value={data.default_theme} onValueChange={(value) => setData('default_theme', value)}>
-                                            <SelectTrigger id="default_theme"><SelectValue /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="system">System preference</SelectItem>
-                                                <SelectItem value="light">Light</SelectItem>
-                                                <SelectItem value="dark">Dark</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.default_theme} />
+                                            <div className="space-y-2">
+                                                <Label htmlFor="default_theme">Default Theme Preset</Label>
+                                                <Select value={data.default_theme} onValueChange={(value) => setData('default_theme', value)}>
+                                                    <SelectTrigger id="default_theme"><SelectValue /></SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="system">System preference</SelectItem>
+                                                        <SelectItem value="light">Light</SelectItem>
+                                                        <SelectItem value="dark">Dark</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError message={errors.default_theme} />
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    {/* LOGO & FAVICON CARD */}
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Logo & Favicon Customization</CardTitle>
+                                            <CardDescription>Manage your visual assets. You can choose a dynamic modern icon preset or upload custom images.</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            {/* Logo Type Selector */}
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-semibold text-muted-foreground">Logo Style Type</Label>
+                                                <div className="flex items-center gap-4 mt-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setData('app_logo_type', 'icon')}
+                                                        className={`flex-1 py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
+                                                            data.app_logo_type === 'icon'
+                                                                ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary/10'
+                                                                : 'border-muted bg-card hover:bg-accent text-muted-foreground'
+                                                        }`}
+                                                    >
+                                                        Lucide Icon Preset
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setData('app_logo_type', 'image')}
+                                                        className={`flex-1 py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
+                                                            data.app_logo_type === 'image'
+                                                                ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary/10'
+                                                                : 'border-muted bg-card hover:bg-accent text-muted-foreground'
+                                                        }`}
+                                                    >
+                                                        Upload Custom Image
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* If logo type is Icon Preset */}
+                                            {data.app_logo_type === 'icon' && (
+                                                <div className="space-y-3 animate-in fade-in-50 duration-200">
+                                                    <Label>Choose Logo Icon Preset</Label>
+                                                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 p-3 bg-muted/40 rounded-xl border">
+                                                        {PRESET_ICONS.map((iconName) => {
+                                                            const Icon = (LucideIcons as any)[iconName] || LucideIcons.Sparkles;
+                                                            const isSelected = data.app_logo_icon === iconName;
+                                                            return (
+                                                                <button
+                                                                    key={iconName}
+                                                                    type="button"
+                                                                    onClick={() => setData('app_logo_icon', iconName)}
+                                                                    className={`flex items-center justify-center p-2.5 rounded-lg border transition-all ${
+                                                                        isSelected
+                                                                            ? 'border-primary bg-primary text-primary-foreground scale-110 shadow-md ring-2 ring-primary/10'
+                                                                            : 'border-muted hover:border-muted-foreground/30 hover:bg-accent bg-card text-muted-foreground'
+                                                                    }`}
+                                                                    title={iconName}
+                                                                >
+                                                                    <Icon className="h-5 w-5 shrink-0" />
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* If logo type is Custom Image */}
+                                            {data.app_logo_type === 'image' && (
+                                                <div className="space-y-4 animate-in fade-in-50 duration-200">
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="logo_file">Upload Logo Image File</Label>
+                                                        <Input
+                                                            id="logo_file"
+                                                            type="file"
+                                                            accept="image/png, image/jpeg, image/svg+xml, image/webp"
+                                                            onChange={handleLogoFileChange}
+                                                            className="cursor-pointer"
+                                                        />
+                                                        <p className="text-xs text-muted-foreground">Supported formats: PNG, JPG, SVG, WEBP. Max size: 2MB.</p>
+                                                        <InputError message={errors.app_logo_file} />
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="app_logo_image_url">Or Image URL</Label>
+                                                        <Input
+                                                            id="app_logo_image_url"
+                                                            placeholder="https://example.com/logo.png"
+                                                            value={data.app_logo_image_url}
+                                                            onChange={(e) => {
+                                                                setData('app_logo_image_url', e.target.value);
+                                                                setLogoPreview(e.target.value);
+                                                            }}
+                                                        />
+                                                        <InputError message={errors.app_logo_image_url} />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Favicon Customization */}
+                                            <div className="border-t pt-6 space-y-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="favicon_file" className="text-base font-semibold">Favicon Asset</Label>
+                                                    <Input
+                                                        id="favicon_file"
+                                                        type="file"
+                                                        accept="image/x-icon, image/png, image/jpeg, image/svg+xml"
+                                                        onChange={handleFaviconFileChange}
+                                                        className="cursor-pointer"
+                                                    />
+                                                    <p className="text-xs text-muted-foreground">Supported formats: ICO, PNG, JPG, SVG. Max size: 1MB.</p>
+                                                    <InputError message={errors.app_favicon_file} />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="app_favicon_url">Or Favicon URL</Label>
+                                                    <Input
+                                                        id="app_favicon_url"
+                                                        placeholder="https://example.com/favicon.ico"
+                                                        value={data.app_favicon_url}
+                                                        onChange={(e) => {
+                                                            setData('app_favicon_url', e.target.value);
+                                                            setFaviconPreview(e.target.value);
+                                                        }}
+                                                    />
+                                                    <InputError message={errors.app_favicon_url} />
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                {/* Right column: Sticky visual preview */}
+                                <div className="space-y-6">
+                                    <div className="sticky top-6">
+                                        <Card className="overflow-hidden border-primary/10 shadow-lg">
+                                            <div className="bg-primary/5 px-4 py-3 border-b border-primary/10">
+                                                <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                                                    <LucideIcons.Sparkles className="h-4 w-4" />
+                                                    Branding Live Preview
+                                                </h3>
+                                            </div>
+                                            <CardContent className="p-6 space-y-6 bg-muted/10">
+                                                {/* Sidebar Header Preview */}
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs text-muted-foreground uppercase tracking-wider">Sidebar Identity Preview</Label>
+                                                    <div className="flex items-center gap-3 p-3 bg-card border rounded-xl shadow-sm">
+                                                        {data.app_logo_type === 'image' && logoPreview ? (
+                                                            <img
+                                                                src={logoPreview}
+                                                                className="h-8 w-8 rounded-lg object-cover border"
+                                                                alt="logo preview"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-8 w-8 items-center justify-center bg-primary/10 text-primary rounded-lg">
+                                                                {(() => {
+                                                                    const Icon = (LucideIcons as any)[data.app_logo_icon] || LucideIcons.Sparkles;
+                                                                    return <Icon className="h-5 w-5 shrink-0 animate-pulse-slow" />;
+                                                                })()}
+                                                            </div>
+                                                        )}
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className="font-bold text-sm text-foreground truncate">{data.app_name || 'Laravel'}</span>
+                                                            <span className="text-[10px] text-muted-foreground leading-none">v1.0.0</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* App Title Tab Preview */}
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs text-muted-foreground uppercase tracking-wider">Browser Tab Preview</Label>
+                                                    <div className="flex items-center gap-2 px-3 py-2 bg-card border rounded-xl shadow-sm text-xs font-medium text-muted-foreground select-none max-w-full truncate">
+                                                        <div className="h-4 w-4 bg-muted border rounded flex items-center justify-center shrink-0">
+                                                            {faviconPreview ? (
+                                                                <img src={faviconPreview} className="h-3.5 w-3.5 object-contain" alt="favicon" />
+                                                            ) : (
+                                                                <LucideIcons.Globe className="h-3 w-3" />
+                                                            )}
+                                                        </div>
+                                                        <span className="truncate">{data.app_name || 'Laravel'} - System Settings</span>
+                                                        <LucideIcons.X className="h-3 w-3 ml-auto hover:bg-muted p-0.5 rounded cursor-pointer shrink-0" />
+                                                    </div>
+                                                </div>
+
+                                                {/* Auth / Login Page Preview */}
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs text-muted-foreground uppercase tracking-wider">Auth Page Branding Preview</Label>
+                                                    <div className="p-4 bg-card border rounded-xl shadow-sm flex flex-col items-center justify-center text-center space-y-2">
+                                                        <div className="inline-flex items-center justify-center p-2.5 rounded-xl bg-primary/10 border border-primary/20 scale-95">
+                                                            {data.app_logo_type === 'image' && logoPreview ? (
+                                                                <img src={logoPreview} className="h-7 w-7 rounded-md object-cover" alt="logo" />
+                                                            ) : (
+                                                                (() => {
+                                                                    const Icon = (LucideIcons as any)[data.app_logo_icon] || LucideIcons.Sparkles;
+                                                                    return <Icon className="h-5 w-5 text-primary shrink-0" />;
+                                                                })()
+                                                            )}
+                                                        </div>
+                                                        <span className="font-bold text-xs text-foreground leading-none">{data.app_name || 'Laravel'}</span>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
                         </TabsContent>
 
                         {/* REGIONAL TAB */}

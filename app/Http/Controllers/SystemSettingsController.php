@@ -59,9 +59,40 @@ class SystemSettingsController extends Controller
             'maintenance_mode' => 'required|boolean',
             'maintenance_bypass_ip' => 'nullable|string',
             'maintenance_message' => 'required|string|max:500',
+
+            // Branding
+            'app_logo_type' => 'required|in:icon,image',
+            'app_logo_icon' => 'required_if:app_logo_type,icon|string',
+            'app_logo_image_url' => 'nullable|string',
+            'app_favicon_url' => 'nullable|string',
+            'app_logo_file' => 'nullable|file|image|max:2048',
+            'app_favicon_file' => 'nullable|file|mimes:ico,png,jpg,jpeg,svg|max:1048',
         ]);
 
         $oldValues = Setting::values();
+
+        // Process logo image upload
+        if ($request->hasFile('app_logo_file')) {
+            $path = $request->file('app_logo_file')->store('branding', 'public');
+            $values['app_logo_image'] = '/storage/' . $path;
+        } else {
+            $values['app_logo_image'] = $request->input('app_logo_image_url') ?? ($oldValues['app_logo_image'] ?? '');
+        }
+
+        // Process favicon upload
+        if ($request->hasFile('app_favicon_file')) {
+            $path = $request->file('app_favicon_file')->store('branding', 'public');
+            $values['app_favicon'] = '/storage/' . $path;
+        } else {
+            $values['app_favicon'] = $request->input('app_favicon_url') ?? ($oldValues['app_favicon'] ?? '');
+        }
+
+        // Clean up fields that do not go into the database
+        unset($values['app_logo_file']);
+        unset($values['app_favicon_file']);
+        unset($values['app_logo_image_url']);
+        unset($values['app_favicon_url']);
+
         Setting::setMany($values);
 
         AuditLog::record(

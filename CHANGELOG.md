@@ -4,6 +4,17 @@ All notable changes to this Laravel + Inertia (React + TypeScript) project will 
 
 ---
 
+## [1.9.0] - 2026-06-21
+
+### Added
+- **Dynamic Favicon Asset**: Support for custom favicon configuration rendering directly in the browser tab from DB settings.
+- **Logo Style Customizer**: Toggle group choosing between 16 modern Lucide icon presets and custom uploaded image files.
+- **Real-time Live Preview Panel**: Sticky layout card simulating how branding inputs look in the sidebar, browser tab, and login screens before saving.
+- **FormData Upload Support**: Configured Inertia client forms to support file attachments utilizing POST method mapping for PATCH settings endpoint.
+
+### Improved
+- **Settings Layout Structure**: Upgraded settings page tab panel with animation fades, responsive grid splits, custom icons, and visual guides.
+
 ## [1.0.0] - 2026-06-20
 
 ### Added

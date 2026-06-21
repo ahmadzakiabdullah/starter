@@ -33,6 +33,10 @@ class Setting extends Model
             'maintenance_mode' => false,
             'maintenance_bypass_ip' => '',
             'maintenance_message' => 'Our site is currently undergoing maintenance. We will be back online shortly!',
+            'app_logo_type' => 'icon',
+            'app_logo_icon' => 'Sparkles',
+            'app_logo_image' => '',
+            'app_favicon' => '',
         ];
     }
 
