@@ -57,9 +57,11 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserCircle2Icon />
-                Account
+              <DropdownMenuItem asChild>
+                <Link href={route('profile.edit')} className="w-full flex items-center cursor-pointer">
+                  <UserCircle2Icon className="mr-2 h-4 w-4" />
+                  Account
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCardIcon />
