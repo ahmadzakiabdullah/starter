@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function () {
     Route::get('dashboard/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('dashboard/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::patch('dashboard/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::delete('dashboard/notifications/clear-all', [NotificationController::class, 'clearAll'])->name('notifications.clear-all');
+    Route::delete('dashboard/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     // Changelogs / Versioning Timeline
     Route::get('dashboard/changelogs', [\App\Http\Controllers\ChangelogController::class, 'index'])->name('changelogs.index');

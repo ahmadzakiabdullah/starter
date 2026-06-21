@@ -34,6 +34,21 @@ class NotificationController extends Controller
         return back();
     }
 
+    public function destroy(Request $request, string $notification): RedirectResponse
+    {
+        $item = $request->user()->notifications()->findOrFail($notification);
+        $item->delete();
+
+        return back()->with('success', 'Notification deleted.');
+    }
+
+    public function clearAll(Request $request): RedirectResponse
+    {
+        $request->user()->notifications()->delete();
+
+        return back()->with('success', 'Notification history cleared.');
+    }
+
     private function notificationData($notification): array
     {
         return [
