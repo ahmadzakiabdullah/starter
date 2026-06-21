@@ -93,6 +93,11 @@ export const navItems: NavGroup[] = [
         icon: LayoutDashboard
       },
       {
+        title: "Media Manager",
+        href: "/dashboard/media",
+        icon: ImagesIcon
+      },
+      {
         title: "Changelog",
         href: "/dashboard/changelogs",
         icon: ActivityIcon

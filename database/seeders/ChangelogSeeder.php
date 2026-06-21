@@ -150,5 +150,21 @@ class ChangelogSeeder extends Seeder
                 ['type' => 'Improved', 'content' => 'Enhanced settings page layouts with animations, responsive visual splits, and custom icons.'],
             ],
         ]);
+
+        Changelog::create([
+            'version' => 'v2.0.0',
+            'title' => 'Media Manager & Reusable Asset Library',
+            'description' => 'Designed and launched the centralized Media Library module, enabling administrators to drag-and-drop uploads, organize files inside virtual folders, rename, delete files in bulk, and select uploaded assets directly inside System Settings via an interactive selector dialog modal.',
+            'release_date' => '2026-06-21',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'Central Media Manager dashboard featuring HTML5 drag-and-drop file upload zones.'],
+                ['type' => 'Added', 'content' => 'Virtual folders penapisan for easy grouping of branding and avatar files.'],
+                ['type' => 'Added', 'content' => 'Reusable MediaSelector React modal component for selecting library assets.'],
+                ['type' => 'Added', 'content' => 'Select from Media Manager buttons in Logo/Favicon settings with live preview links.'],
+                ['type' => 'Added', 'content' => 'Multi-file selection checkboxes enabling bulk delete operations.'],
+                ['type' => 'Added', 'content' => 'Database migrations for storage file tracking.'],
+            ],
+        ]);
     }
 }

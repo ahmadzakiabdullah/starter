@@ -13,6 +13,7 @@ import * as LucideIcons from 'lucide-react';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import MediaSelector from '@/Components/media/MediaSelector';
 
 const { Settings, Globe, ShieldAlert, Mail, Wrench, Loader2, Send, Trash2, RefreshCw, Server, ShieldCheck, AlertCircle } = LucideIcons;
 
@@ -107,6 +108,10 @@ export default function Edit({ settings }: SettingsProps) {
     // Dynamic Visual Previews local state
     const [logoPreview, setLogoPreview] = useState<string | null>(settings.app_logo_image || null);
     const [faviconPreview, setFaviconPreview] = useState<string | null>(settings.app_favicon || null);
+
+    // Media Selector Modal state
+    const [mediaModalOpen, setMediaModalOpen] = useState(false);
+    const [mediaSelectTarget, setMediaSelectTarget] = useState<'logo' | 'favicon' | null>(null);
 
     const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -330,13 +335,27 @@ export default function Edit({ settings }: SettingsProps) {
                                                 <div className="space-y-4 animate-in fade-in-50 duration-200">
                                                     <div className="space-y-2">
                                                         <Label htmlFor="logo_file">Upload Logo Image File</Label>
-                                                        <Input
-                                                            id="logo_file"
-                                                            type="file"
-                                                            accept="image/png, image/jpeg, image/svg+xml, image/webp"
-                                                            onChange={handleLogoFileChange}
-                                                            className="cursor-pointer"
-                                                        />
+                                                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                                            <Input
+                                                                id="logo_file"
+                                                                type="file"
+                                                                accept="image/png, image/jpeg, image/svg+xml, image/webp"
+                                                                onChange={handleLogoFileChange}
+                                                                className="cursor-pointer flex-1"
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                onClick={() => {
+                                                                    setMediaSelectTarget('logo');
+                                                                    setMediaModalOpen(true);
+                                                                }}
+                                                                className="flex items-center gap-1.5"
+                                                            >
+                                                                <LucideIcons.Image className="h-4 w-4 shrink-0" />
+                                                                Select from Library
+                                                            </Button>
+                                                        </div>
                                                         <p className="text-xs text-muted-foreground">Supported formats: PNG, JPG, SVG, WEBP. Max size: 2MB.</p>
                                                         <InputError message={errors.app_logo_file} />
                                                     </div>
@@ -361,13 +380,27 @@ export default function Edit({ settings }: SettingsProps) {
                                             <div className="border-t pt-6 space-y-4">
                                                 <div className="space-y-2">
                                                     <Label htmlFor="favicon_file" className="text-base font-semibold">Favicon Asset</Label>
-                                                    <Input
-                                                        id="favicon_file"
-                                                        type="file"
-                                                        accept="image/x-icon, image/png, image/jpeg, image/svg+xml"
-                                                        onChange={handleFaviconFileChange}
-                                                        className="cursor-pointer"
-                                                    />
+                                                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                                        <Input
+                                                            id="favicon_file"
+                                                            type="file"
+                                                            accept="image/x-icon, image/png, image/jpeg, image/svg+xml"
+                                                            onChange={handleFaviconFileChange}
+                                                            className="cursor-pointer flex-1"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={() => {
+                                                                setMediaSelectTarget('favicon');
+                                                                setMediaModalOpen(true);
+                                                            }}
+                                                            className="flex items-center gap-1.5"
+                                                        >
+                                                            <LucideIcons.Image className="h-4 w-4 shrink-0" />
+                                                            Select from Library
+                                                        </Button>
+                                                    </div>
                                                     <p className="text-xs text-muted-foreground">Supported formats: ICO, PNG, JPG, SVG. Max size: 1MB.</p>
                                                     <InputError message={errors.app_favicon_file} />
                                                 </div>
@@ -721,6 +754,21 @@ export default function Edit({ settings }: SettingsProps) {
                     </div>
                 </form>
             </div>
+
+            <MediaSelector
+                open={mediaModalOpen}
+                onOpenChange={setMediaModalOpen}
+                allowedTypes={mediaSelectTarget === 'logo' || mediaSelectTarget === 'favicon' ? 'image' : 'all'}
+                onSelect={(file) => {
+                    if (mediaSelectTarget === 'logo') {
+                        setData('app_logo_image_url', file.url);
+                        setLogoPreview(file.url);
+                    } else if (mediaSelectTarget === 'favicon') {
+                        setData('app_favicon_url', file.url);
+                        setFaviconPreview(file.url);
+                    }
+                }}
+            />
         </AuthenticatedLayout>
     );
 }

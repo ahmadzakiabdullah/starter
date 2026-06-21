@@ -10,6 +10,7 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\LogReaderController;
 use App\Http\Controllers\HealthMonitorController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MediaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -71,6 +72,13 @@ Route::middleware('auth')->group(function () {
     Route::get('dashboard/logs', [LogReaderController::class, 'index'])->name('logs.index');
     Route::get('dashboard/logs/download', [LogReaderController::class, 'download'])->name('logs.download');
     Route::delete('dashboard/logs', [LogReaderController::class, 'destroy'])->name('logs.destroy');
+
+    // Media Manager
+    Route::get('dashboard/media', [MediaController::class, 'index'])->name('media.index');
+    Route::post('dashboard/media/upload', [MediaController::class, 'upload'])->name('media.upload');
+    Route::patch('dashboard/media/{media}/rename', [MediaController::class, 'rename'])->name('media.rename');
+    Route::delete('dashboard/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+    Route::post('dashboard/media/bulk-destroy', [MediaController::class, 'bulkDestroy'])->name('media.bulk-destroy');
 
     Route::get('dashboard/health', [HealthMonitorController::class, 'index'])->name('health.index');
 });

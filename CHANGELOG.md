@@ -4,6 +4,15 @@ All notable changes to this Laravel + Inertia (React + TypeScript) project will 
 
 ---
 
+## [2.0.0] - 2026-06-21
+
+### Added
+- **Centralized Media Manager Dashboard**: Introduced a media assets portal equipped with virtual folder categorizations, asset search/filter capabilities, metadata side-panel inspectors, and click-to-copy URL link actions.
+- **Drag-and-Drop Dropzones**: Integrated HTML5 native drag-and-drop file upload interfaces for both the main dashboard and selector modals.
+- **Reusable MediaSelector React Dialog**: Built a modal popover to select media library assets from any form input page.
+- **System Settings Integration**: Added "Select from Library" actions to branding file input pickers, allowing admins to pick system logos and favicons directly from the media library database.
+- **Bulk Delete Operations**: Enabled checkboxes for files and a bulk delete button to clear multiple assets in a single batch.
+
 ## [1.9.0] - 2026-06-21
 
 ### Added
