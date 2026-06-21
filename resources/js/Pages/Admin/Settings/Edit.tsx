@@ -195,15 +195,30 @@ export default function Edit({ settings }: SettingsProps) {
                         <p className="text-sm text-muted-foreground">Configure application defaults, localization, security policies, and system utilities.</p>
                     </div>
 
-                    {data.maintenance_mode && (
-                        <div className="flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/25 px-4 py-1.5 text-xs font-semibold text-amber-500 animate-pulse">
-                            <ShieldAlert className="h-4 w-4" />
-                            Maintenance Mode Active
-                        </div>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {data.maintenance_mode && (
+                            <div className="flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/25 px-4 py-1.5 text-xs font-semibold text-amber-500 animate-pulse">
+                                <ShieldAlert className="h-4 w-4" />
+                                Maintenance Mode Active
+                            </div>
+                        )}
+                        <Button type="submit" form="settings-form" disabled={processing} className="shadow-sm">
+                            {processing ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <LucideIcons.Save className="mr-2 h-4 w-4" />
+                                    Save Settings
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </div>
 
-                <form onSubmit={submit} className="space-y-6">
+                <form id="settings-form" onSubmit={submit} className="space-y-6">
                     <Tabs defaultValue="general" className="w-full">
                         <TabsList className="bg-muted/80 grid w-full grid-cols-2 md:flex md:w-auto items-center justify-start gap-1 p-1 h-auto mb-6">
                             <TabsTrigger value="general" className="flex items-center gap-2 py-2.5 px-4">
@@ -749,9 +764,6 @@ export default function Edit({ settings }: SettingsProps) {
                         </TabsContent>
                     </Tabs>
 
-                    <div className="flex justify-end border-t pt-6">
-                        <Button type="submit" disabled={processing}>{processing ? 'Saving...' : 'Save System Settings'}</Button>
-                    </div>
                 </form>
             </div>
 
