@@ -13,6 +13,8 @@ class ChangelogController extends Controller
 {
     public function index(Request $request): Response
     {
+        Changelog::syncFromGit();
+
         $changelogs = Changelog::query()
             ->orderBy('release_date', 'desc')
             ->orderBy('id', 'desc')
