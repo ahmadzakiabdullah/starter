@@ -45,21 +45,21 @@ const members = [
     id: 1,
     name: "Toby Belhome",
     email: "contact@bundui.io",
-    avatar: `/images/avatars/01.png`,
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=Toby",
     role_id: 1
   },
   {
     id: 2,
     name: "Jackson Lee",
     email: "pre@example.com",
-    avatar: `/images/avatars/02.png`,
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=Jackson",
     role_id: 2
   },
   {
     id: 3,
     name: "Hally Gray",
     email: "hally@site.com",
-    avatar: `/images/avatars/03.png`,
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=Hally",
     role_id: 1
   }
 ];

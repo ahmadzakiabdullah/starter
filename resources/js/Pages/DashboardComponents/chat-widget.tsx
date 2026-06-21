@@ -30,27 +30,27 @@ const users = [
   {
     name: "Olivia Martin",
     email: "m@example.com",
-    avatar: `/images/avatars/01.png`
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=Olivia"
   },
   {
     name: "Isabella Nguyen",
     email: "isabella.nguyen@email.com",
-    avatar: `/images/avatars/07.png`
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=Isabella"
   },
   {
     name: "Emma Wilson",
     email: "emma@example.com",
-    avatar: `/images/avatars/02.png`
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=Emma"
   },
   {
     name: "Jackson Lee",
     email: "lee@example.com",
-    avatar: `/images/avatars/09.png`
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=Jackson"
   },
   {
     name: "William Kim",
     email: "will@email.com",
-    avatar: `/images/avatars/06.png`
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=William"
   }
 ] as const;
 
@@ -87,7 +87,7 @@ export function ChatWidget() {
         <CardHeader className="flex flex-row items-center">
           <div className="flex items-center space-x-4">
             <Avatar>
-              <AvatarImage src={`/images/avatars/04.png`} />
+              <AvatarImage src="https://api.dicebear.com/7.x/lorelei/svg?seed=Sofia" />
               <AvatarFallback>OM</AvatarFallback>
             </Avatar>
             <div>
