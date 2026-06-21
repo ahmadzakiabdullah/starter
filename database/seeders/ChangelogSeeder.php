@@ -182,5 +182,22 @@ class ChangelogSeeder extends Seeder
                 ['type' => 'Fixed', 'content' => 'Stitched User Account navigation link in user sidebar dropdown.'],
             ],
         ]);
+
+        Changelog::create([
+            'version' => 'v2.2.0',
+            'title' => 'Feature Flags & Access Matrix Control',
+            'description' => 'Introduced dashboard-level feature flags control matrix enabling dynamic toggle control for 6 main system modules, responsive interface element hiding, constructor middleware protections, and user verification toggles.',
+            'release_date' => '2026-06-21',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'Feature Flags & Module Management panel dynamically toggling 6 system features.'],
+                ['type' => 'Added', 'content' => 'Constructor-level middleware checking active status of individual modules.'],
+                ['type' => 'Added', 'content' => 'Responsive UI element hiding and fallbacks for disabled modules.'],
+                ['type' => 'Added', 'content' => 'User verification email_verified_at switch inside create/edit forms.'],
+                ['type' => 'Changed', 'content' => 'Settings page layout width restriction removal.'],
+                ['type' => 'Fixed', 'content' => 'Route Model Binding query columns for user listings.'],
+                ['type' => 'Fixed', 'content' => 'Prevention of self-deverification account lockouts.'],
+            ],
+        ]);
     }
 }
