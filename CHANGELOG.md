@@ -4,6 +4,26 @@ All notable changes to this Laravel + Inertia (React + TypeScript) project will 
 
 ---
 
+## [2.2.0] - 2026-06-21
+
+### Added
+- **Feature Flags & Module Management**: Dashboard control panel for Superadmins to dynamically toggle, enable, and disable 6 application modules: Notifications, Active Sessions, Multi-theme Presets, Broadcast Banners, Live Telemetry Charts, API Access Keys.
+- **Backend Access Restrictions**: Constructor-level middleware controls in related controllers that abort request actions with a `403 Forbidden` status when their module toggle is deactivated in settings.
+- **Responsive UI Fallbacks & Hiding**:
+  - Hides the Notifications bell in the site header.
+  - Hides color preset pickers inside the theme switcher dropdown.
+  - Hides the global Announcement alert ribbon.
+  - Hides API Keys and Active Devices tabs under the User Profile settings menu.
+  - Automatically switches the Telemetry widget chart to a clean progress bar listing for CPU/Memory loads when the Recharts line graph is disabled.
+- **User Verification Control in Forms**: Added an Account Status card below the user avatar in the User Create/Edit form, enabling admins to toggle email verification status (`email_verified_at`) using a Switch toggle.
+
+### Changed
+- **Settings Layout Width**: Removed the `max-w-5xl` layout restriction from the System Settings panel, allowing form fields and columns to grow dynamically and occupy the full screen width.
+
+### Fixed
+- **User Route Model Binding**: Configured Laravel Route Model Binding on the `User` model to query using the `username` column instead of the numeric `id` column, replacing parameter passings across user index actions.
+- **Self-Deverification Lockouts**: Prevented the currently authenticated user from toggling their own verification switch in both the user index table and edit forms to avoid self-lockouts.
+
 ## [2.1.0] - 2026-06-21
 
 ### Added
