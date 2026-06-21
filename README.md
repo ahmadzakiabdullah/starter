@@ -1,58 +1,95 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel + Inertia.js (React + TypeScript) Starter Kit
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem asas (*starter kit*) ini merupakan aplikasi portal pentadbiran premium yang dibina menggunakan gabungan Laravel 11/12, Inertia.js, React (TypeScript), Tailwind CSS v4, dan Shadcn UI. Sistem ini menyediakan asas modular yang kukuh untuk pembangunan aplikasi web perusahaan.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Status Semasa & Modul Sistem (System Modules)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Sistem ini telah lengkap dibangunkan, diuji kompilasinya, dan mempunyai modul-modul berikut:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. 📂 Pengurus Media (Media Manager) - Versi Pelepasan `v2.0.0`
+* **Pustaka Media Berpusat:** Ruang panel interaktif untuk memuat naik, mencari, dan menapis aset fail sistem.
+* **Sokongan Folder Maya:** Mengkategorikan fail secara logik ke dalam folder maya tanpa mengubah struktur fizikal fail.
+* **Drag-and-Drop Uploader:** Zon seretan fail yang lancar untuk muat naik fail pantas sehingga 10MB.
+* **Pemadaman Pukal (Bulk Actions):** Keupayaan untuk memilih berbilang fail dan memadamkannya secara serentak.
+* **Komponen MediaSelector Modal:** Komponen popover dialog yang boleh diguna semula untuk memilih aset logo/favicon dari pustaka media dalam mana-mana form input.
 
-## Learning Laravel
+### 2. ⚙️ Pengurusan Tetapan Branding & Sistem
+* **Live Branding Preview:** Panel simulasi masa-nyata (*sticky card preview*) untuk melihat perubahan Logo (Lucide Icon vs Fail Gambar), Favicon, dan Nama Aplikasi pada sidebar, tab pelayar, dan halaman log masuk secara langsung sebelum disimpan.
+* **Pusat Kandungan Reka Letak:** Seluruh halaman tetapan branding diselaraskan ke kedudukan tengah (`mx-auto max-w-5xl`) untuk memaksimumkan visual pada monitor skrin lebar.
+* **Butang Simpan di Header Atas:** Butang *Save Settings* dialih ke bahagian atas kanan header menggunakan rujukan atribut `form="settings-form"` untuk kemudahan simpanan yang pantas tanpa perlu skrol ke bawah.
+* **Pembersihan Cache Sistem:** Utiliti butang pantas untuk mengosongkan cache aplikasi, cache laluan (*routes*), cache *views*, serta optimisasi fail sistem secara berpusat.
+* **Konfigurasi SMTP & Ujian Hubungan:** Antara muka tetapan mel (driver SMTP/Log) dilengkapi dengan butang **Test SMTP Connection** untuk mengesahkan parameter emel secara langsung.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3. 👥 Pengurusan Pengguna & Peranan (Users & Roles CRUD)
+* **Profil & Akses Klien:** Pendaftaran, kemaskini profil, penukaran avatar, dan pemadaman pengguna.
+* **Kawalan Peranan (Roles & Permissions):** Sistem penetapan peranan (`Superadmin`, `Admin`, `Manager`, `User`) berasaskan kotak pilihan interaktif.
+* **Export Profil:** Utiliti mengeksport data profil pengguna yang dipilih ke dalam format fail CSV.
+* **Sokongan 2FA:** Penyepaduan Pengesahan Dua Faktor (*Two-Factor Authentication*) untuk kawalan keselamatan tinggi.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 4. 📈 Papan Pemuka, Telemetri & Log Audit
+* **Statistik Utama:** Kad status visual menunjukkan bilangan keseluruhan profil, pentadbir, status verifikasi emel, dan barisan tugasan.
+* **Pemberitahuan Sistem:** Senarai notifikasi penting sistem berserta fungsi padam semua dan tandakan telah dibaca.
+* **Widget Telemetri Sistem:** Paparan peratusan penggunaan CPU, RAM, dan Kapasiti Disk secara *real-time*.
+* **Log Audit Aktiviti:** Jejak audit komprehensif merekodkan sebarang aktiviti sistem berserta data sebelum/selepas perubahan dan IP alamat pengguna.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 5. 🛠️ Diagnostik & Sandaran (System Backups & Logs)
+* **Log Reader Dashboard:** Panel membaca fail log Laravel secara langsung dari panel admin tanpa perlu membuka fail `.log` secara manual.
+* **Backup Manager:** Utiliti menjana arkib sandaran fail dan pangkalan data sistem, memuat turun arkib `.zip`, dan memadam fail sandaran lama.
+* **Health Monitor Dashboard:** Metrik kesihatan pangkalan data, sambungan pelayan, dan status cache.
 
-## Agentic Development
+### 6. 📜 Garis Masa Changelogs (Versi Sistem)
+* **Accordion Changelogs UI:** Papan paparan log versi sistem yang kemas menggunakan elemen Accordion Radix UI. Nota pelepasan terkini dipaparkan secara automatik manakala versi lama boleh dikembangkan secara interaktif untuk menjimatkan ruang halaman.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
+## 🛠️ Pemasangan & Persediaan Pelayan (Installation)
+
+Ikuti langkah-langkah berikut untuk menjalankan projek ini di persekitaran tempatan anda:
+
+### 1. Klon Repositori & Pasang Dependensi
 ```bash
-composer require laravel/boost --dev
+# Pasang dependensi PHP (Composer)
+composer install
 
-php artisan boost:install
+# Pasang dependensi Frontend (NPM)
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Konfigurasi Fail Persekitaran (.env)
+Salin fail `.env.example` kepada `.env` dan kemaskini konfigurasi pangkalan data MySQL anda:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Contributing
+### 3. Jana Kunci Aplikasi & Jalankan Migrasi
+```bash
+# Jana APP_KEY
+php artisan key:generate
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Jalankan migrasi pangkalan data berserta seeders (Pengguna, Peranan & Changelogs)
+php artisan migrate:fresh --seed
+```
 
-## Code of Conduct
+### 4. Jalankan Pelayan Tempatan
+```bash
+# Jalankan Laravel Dev Server (Terminal 1)
+php artisan serve
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Jalankan Vite Hot Dev Server (Terminal 2)
+npm run dev
+```
 
-## Security Vulnerabilities
+Kini aplikasi anda boleh diakses melalui laman tempatan: `http://127.0.0.1:8000` atau `http://laravel.test/`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🎨 Konvensyen Kod Fail (Coding Conventions)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Sila rujuk fail **[PROJECT_MAP.md](PROJECT_MAP.md)** untuk melihat struktur folder core, skema pangkalan data penuh, peraturan penamaan fail, dan alias import TypeScript `@/` bagi mengekalkan konsistensi kod.
