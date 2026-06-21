@@ -149,7 +149,7 @@ export default function CreateEdit({ user, roles }: CreateEditProps) {
         e.preventDefault();
         
         if (isEdit) {
-            post(route('users.update', user.id), {
+            post(route('users.update', user.username), {
                 onSuccess: () => toast.success('User updated successfully.'),
                 onError: () => toast.error('Failed to update user. Please check the inputs.')
             });

@@ -145,9 +145,9 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
         );
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (username: string, id: number) => {
         if (confirm('Are you sure you want to delete this user?')) {
-            router.delete(route('users.destroy', id), {
+            router.delete(route('users.destroy', username), {
                 onSuccess: () => {
                     setSelectedIds(selectedIds.filter(val => val !== id));
                 },
@@ -155,8 +155,8 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
         }
     };
 
-    const handleToggleVerification = (id: number) => {
-        router.patch(route('users.toggle-verification', id), {}, {
+    const handleToggleVerification = (username: string) => {
+        router.patch(route('users.toggle-verification', username), {}, {
             preserveScroll: true,
             onSuccess: (page) => {
                 const updatedFlash = page.props.flash as { success?: string };
@@ -454,7 +454,7 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                         <TableCell>
                                             <button
                                                 type="button"
-                                                onClick={() => handleToggleVerification(user.id)}
+                                                onClick={() => handleToggleVerification(user.username)}
                                                 disabled={user.id === currentUser.id}
                                                 title={user.id === currentUser.id ? "Cannot toggle own state" : "Click to toggle verification status"}
                                                 className="focus:outline-none transition-transform active:scale-95 disabled:pointer-events-none"
@@ -489,14 +489,14 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
                                                 <Button variant="outline" size="icon" asChild className="h-8 w-8 hover:bg-primary/5 hover:text-primary">
-                                                    <Link href={route('users.edit', user.id)}>
+                                                    <Link href={route('users.edit', user.username)}>
                                                         <Edit2 className="h-3.5 w-3.5" />
                                                     </Link>
                                                 </Button>
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
-                                                    onClick={() => handleDelete(user.id)}
+                                                    onClick={() => handleDelete(user.username, user.id)}
                                                     disabled={user.id === currentUser.id}
                                                     className="h-8 w-8 text-destructive hover:bg-destructive/5 hover:text-destructive disabled:opacity-30 disabled:cursor-not-allowed"
                                                 >
