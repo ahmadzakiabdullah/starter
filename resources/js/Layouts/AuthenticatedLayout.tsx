@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from "react";
 import { SidebarInset, SidebarProvider } from "@/Components/ui/sidebar";
 import { AppSidebar } from "@/Components/layout/sidebar/app-sidebar";
 import { SiteHeader } from "@/Components/layout/header";
+import AnnouncementBanner from "@/Components/layout/AnnouncementBanner";
 
 export default function AuthenticatedLayout({
     children,
@@ -21,6 +22,7 @@ export default function AuthenticatedLayout({
             }>
             <AppSidebar variant="inset" />
             <SidebarInset>
+                <AnnouncementBanner />
                 <SiteHeader />
                 <div className="bg-muted/40 flex flex-1 flex-col">
                     <div className="@container/main p-(--content-padding) xl:group-data-[theme-content-layout=centered]/layout:container xl:group-data-[theme-content-layout=centered]/layout:mx-auto">

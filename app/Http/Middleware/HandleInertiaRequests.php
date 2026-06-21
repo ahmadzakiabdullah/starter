@@ -64,6 +64,7 @@ class HandleInertiaRequests extends Middleware
             ] : ['unread_count' => 0, 'items' => []],
             'system' => fn () => Setting::values(),
             'app_version' => fn () => \App\Models\Changelog::latestVersion(),
+            'active_announcement' => fn () => \App\Models\Announcement::active(),
         ];
     }
 }

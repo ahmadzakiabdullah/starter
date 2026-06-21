@@ -14,8 +14,20 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import MediaSelector from '@/Components/media/MediaSelector';
+import AnnouncementSettings from './Partials/AnnouncementSettings';
 
 const { Settings, Globe, ShieldAlert, Mail, Wrench, Loader2, Send, Trash2, RefreshCw, Server, ShieldCheck, AlertCircle } = LucideIcons;
+
+interface Announcement {
+    id: number;
+    title: string;
+    content: string;
+    style: 'info' | 'warning' | 'danger' | 'success';
+    is_active: boolean;
+    starts_at: string | null;
+    ends_at: string | null;
+    created_at: string;
+}
 
 interface SettingsProps {
     settings: {
@@ -46,6 +58,7 @@ interface SettingsProps {
         app_logo_image?: string;
         app_favicon?: string;
     };
+    announcements: Announcement[];
 }
 
 const COMMON_TIMEZONES = [
@@ -69,7 +82,7 @@ const PRESET_ICONS = [
     'Flame', 'Zap', 'Workflow', 'Heart'
 ];
 
-export default function Edit({ settings }: SettingsProps) {
+export default function Edit({ settings, announcements }: SettingsProps) {
     const { data, setData, post, processing, errors } = useForm({
         app_name: settings.app_name ?? '',
         app_description: settings.app_description ?? '',
@@ -220,7 +233,7 @@ export default function Edit({ settings }: SettingsProps) {
 
                 <form id="settings-form" onSubmit={submit} className="space-y-6">
                     <Tabs defaultValue="general" className="w-full">
-                        <TabsList className="bg-muted/80 grid w-full grid-cols-2 md:flex md:w-auto items-center justify-start gap-1 p-1 h-auto mb-6">
+                        <TabsList className="bg-muted/80 grid grid-cols-2 sm:grid-cols-3 md:flex md:w-auto items-center justify-start gap-1 p-1 h-auto mb-6">
                             <TabsTrigger value="general" className="flex items-center gap-2 py-2.5 px-4">
                                 <Settings className="h-4 w-4" />
                                 General
@@ -240,6 +253,10 @@ export default function Edit({ settings }: SettingsProps) {
                             <TabsTrigger value="maintenance" className="flex items-center gap-2 py-2.5 px-4">
                                 <Wrench className="h-4 w-4" />
                                 System & Maintenance
+                            </TabsTrigger>
+                            <TabsTrigger value="announcements" className="flex items-center gap-2 py-2.5 px-4">
+                                <LucideIcons.Megaphone className="h-4 w-4" />
+                                Broadcast Banners
                             </TabsTrigger>
                         </TabsList>
 
@@ -761,6 +778,11 @@ export default function Edit({ settings }: SettingsProps) {
                                     </div>
                                 </CardContent>
                             </Card>
+                        </TabsContent>
+
+                        {/* ANNOUNCEMENTS TAB */}
+                        <TabsContent value="announcements" className="space-y-6 outline-none">
+                            <AnnouncementSettings announcements={announcements} />
                         </TabsContent>
                     </Tabs>
 

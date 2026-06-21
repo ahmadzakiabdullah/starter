@@ -1,5 +1,6 @@
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import AnnouncementBanner from '@/Components/layout/AnnouncementBanner';
 
 export default function Welcome({
     auth,
@@ -21,6 +22,7 @@ export default function Welcome({
         <>
             <Head title="Welcome" />
             <div className="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
+                <AnnouncementBanner />
                 <img
                     id="background"
                     className="absolute -left-20 top-0 max-w-[877px]"

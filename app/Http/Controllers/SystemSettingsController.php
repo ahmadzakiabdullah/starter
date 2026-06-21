@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\Announcement;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\SystemSettingsUpdated;
@@ -21,6 +22,7 @@ class SystemSettingsController extends Controller
 
         return Inertia::render('Admin/Settings/Edit', [
             'settings' => Setting::values(),
+            'announcements' => Announcement::latest()->get(),
         ]);
     }
 

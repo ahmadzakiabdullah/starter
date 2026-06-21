@@ -13,11 +13,14 @@ import {
     QrCode, 
     LogOut,
     Eye,
-    EyeOff
+    EyeOff,
+    Key
 } from 'lucide-react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
+import SessionsManager from './Partials/SessionsManager';
+import ApiTokenManager from './Partials/ApiTokenManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -52,7 +55,6 @@ export default function Edit({
 }: EditProps) {
     const [activeTab, setActiveTab] = useState('profile');
     const [confirmingDisable2fa, setConfirmingDisable2fa] = useState(false);
-    const [confirmingDeviceLogout, setConfirmingDeviceLogout] = useState(false);
 
     // 2FA forms
     const enable2faForm = useForm({});
@@ -60,11 +62,6 @@ export default function Edit({
         code: ''
     });
     const disable2faForm = useForm({
-        password: ''
-    });
-
-    // Session logouts
-    const logoutSessionsForm = useForm({
         password: ''
     });
 
@@ -103,19 +100,7 @@ export default function Edit({
         });
     };
 
-    const handleLogoutOtherDevices = (e: React.FormEvent) => {
-        e.preventDefault();
-        logoutSessionsForm.post(route('profile.sessions.logout'), {
-            onSuccess: () => {
-                setConfirmingDeviceLogout(false);
-                logoutSessionsForm.reset();
-                toast.success('Logged out of all other device sessions.');
-            },
-            onError: () => {
-                toast.error('Incorrect password.');
-            }
-        });
-    };
+
 
     return (
         <AuthenticatedLayout>
@@ -146,6 +131,10 @@ export default function Edit({
                         <TabsTrigger value="sessions" className="flex items-center gap-1.5 text-xs py-2 px-4 rounded">
                             <Laptop className="h-4 w-4" />
                             Active Devices
+                        </TabsTrigger>
+                        <TabsTrigger value="api-tokens" className="flex items-center gap-1.5 text-xs py-2 px-4 rounded">
+                            <Key className="h-4 w-4" />
+                            API Access Keys
                         </TabsTrigger>
                     </TabsList>
 
@@ -272,66 +261,12 @@ export default function Edit({
 
                     {/* ACTIVE DEVICES SESSIONS TAB */}
                     <TabsContent value="sessions">
-                        <div className="bg-card p-6 border rounded-xl shadow-xs space-y-6">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4">
-                                <div>
-                                    <h3 className="text-base font-bold text-foreground">Active Browser Sessions</h3>
-                                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                                        Manage your current session devices. If you suspect unauthorized access, you can instantly terminate all other device tokens.
-                                    </p>
-                                </div>
-                                {sessions.length > 1 && (
-                                    <Button 
-                                        type="button" 
-                                        variant="outline" 
-                                        size="sm"
-                                        onClick={() => setConfirmingDeviceLogout(true)}
-                                        className="text-destructive hover:bg-destructive/5 hover:text-destructive shrink-0"
-                                    >
-                                        <LogOut className="h-4 w-4 mr-1.5" />
-                                        Logout Other Devices
-                                    </Button>
-                                )}
-                            </div>
+                        <SessionsManager />
+                    </TabsContent>
 
-                            <div className="space-y-3.5">
-                                {sessions.map((item) => (
-                                    <div key={item.id} className="flex items-start gap-3.5 p-3.5 border rounded-lg hover:bg-muted/10 transition-colors">
-                                        <div className="p-2.5 rounded-lg border bg-muted shrink-0 text-muted-foreground">
-                                            {item.platform === 'iOS' || item.platform === 'Android' ? (
-                                                <Smartphone className="h-4.5 w-4.5" />
-                                            ) : (
-                                                <Laptop className="h-4.5 w-4.5" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0 text-xs">
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="font-semibold text-foreground">
-                                                    {item.platform} • {item.browser}
-                                                </span>
-                                                {item.is_current ? (
-                                                    <span className="text-[9px] bg-green-500/10 text-green-500 border border-green-500/20 px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">
-                                                        Current Device
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-[9px] bg-muted text-muted-foreground px-1.5 py-0.2 rounded font-medium">
-                                                        Active
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="text-[10px] text-muted-foreground font-mono mt-1">
-                                                IP: {item.ip_address || 'Unknown'}
-                                            </div>
-                                            {!item.is_current && (
-                                                <div className="text-[10px] text-muted-foreground mt-0.5">
-                                                    Last active: {item.last_active}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                    {/* API ACCESS KEYS TAB */}
+                    <TabsContent value="api-tokens">
+                        <ApiTokenManager />
                     </TabsContent>
                 </Tabs>
             </div>
@@ -372,49 +307,6 @@ export default function Edit({
                                 </Button>
                                 <Button type="submit" variant="destructive" disabled={disable2faForm.processing}>
                                     Disable 2FA
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-            )}
-
-            {/* CONFIRM LOGOUT DEVICES DIALOG */}
-            {confirmingDeviceLogout && (
-                <Dialog open={confirmingDeviceLogout} onOpenChange={() => setConfirmingDeviceLogout(false)}>
-                    <DialogContent className="sm:rounded-xl">
-                        <form onSubmit={handleLogoutOtherDevices}>
-                            <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2 text-destructive">
-                                    <LogOut className="h-5 w-5" />
-                                    Log Out Other Browser Sessions
-                                </DialogTitle>
-                                <DialogDescription>
-                                    Please enter your current account password to revoke session tokens on all other device browsers.
-                                </DialogDescription>
-                            </DialogHeader>
-
-                            <div className="my-4 space-y-1.5">
-                                <Label htmlFor="logout_pwd">Current Password</Label>
-                                <Input
-                                    id="logout_pwd"
-                                    type="password"
-                                    placeholder="Enter password..."
-                                    value={logoutSessionsForm.data.password}
-                                    onChange={e => logoutSessionsForm.setData('password', e.target.value)}
-                                    required
-                                />
-                                {logoutSessionsForm.errors.password && (
-                                    <p className="text-red-500 text-[10px]">{logoutSessionsForm.errors.password}</p>
-                                )}
-                            </div>
-
-                            <DialogFooter>
-                                <Button type="button" variant="ghost" onClick={() => setConfirmingDeviceLogout(false)}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" variant="destructive" disabled={logoutSessionsForm.processing}>
-                                    Revoke Sessions
                                 </Button>
                             </DialogFooter>
                         </form>

@@ -6,11 +6,14 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SystemSettingsController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\LogReaderController;
 use App\Http\Controllers\HealthMonitorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\ApiTokenController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -37,6 +40,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/two-factor/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('profile.two-factor.confirm');
     Route::post('/profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
     Route::post('/profile/sessions/logout', [ProfileController::class, 'logoutOtherDevices'])->name('profile.sessions.logout');
+    Route::get('/profile/sessions', [SessionController::class, 'getActiveSessions'])->name('profile.sessions.index');
+    Route::delete('/profile/sessions/{id}', [SessionController::class, 'revokeSession'])->name('profile.sessions.destroy');
+    Route::delete('/profile/sessions', [SessionController::class, 'revokeOtherSessions'])->name('profile.sessions.destroy-other');
+    Route::get('/profile/api-tokens', [ApiTokenController::class, 'index'])->name('profile.api-tokens.index');
+    Route::post('/profile/api-tokens', [ApiTokenController::class, 'store'])->name('profile.api-tokens.store');
+    Route::delete('/profile/api-tokens/{id}', [ApiTokenController::class, 'destroy'])->name('profile.api-tokens.destroy');
 
     // Admin CRUD routes
     Route::post('dashboard/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
@@ -51,6 +60,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('dashboard/settings', [SystemSettingsController::class, 'update'])->name('settings.update');
     Route::post('dashboard/settings/test-smtp', [SystemSettingsController::class, 'testSmtp'])->name('settings.test-smtp');
     Route::post('dashboard/settings/clear-cache', [SystemSettingsController::class, 'clearCache'])->name('settings.clear-cache');
+
+    // Announcement admin management routes
+    Route::post('dashboard/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::patch('dashboard/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::patch('dashboard/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggle'])->name('announcements.toggle');
+    Route::delete('dashboard/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     Route::get('dashboard/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('dashboard/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::patch('dashboard/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');

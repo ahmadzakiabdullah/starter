@@ -75,6 +75,30 @@ Stores uploaded file metadata:
 - `disk` (String) - Disk storage type (default: `public`)
 - `timestamps` (`created_at`, `updated_at`)
 
+### 4. `personal_access_tokens` Table
+Handles Laravel Sanctum API token keys:
+- `id` (BigInt, Primary Key, Auto-Increment)
+- `tokenable_id` (BigInt) - Reference to User ID
+- `tokenable_type` (String) - Model class namespace
+- `name` (String) - Label describing token purpose
+- `token` (String, 64 chars) - Hashed API key
+- `abilities` (Text, Nullable) - Permissions list
+- `last_used_at` (Timestamp, Nullable)
+- `expires_at` (Timestamp, Nullable)
+- `timestamps` (`created_at`, `updated_at`)
+
+### 5. `announcements` Table
+Handles global dashboard notice broadcasting:
+- `id` (BigInt, Primary Key, Auto-Increment)
+- `title` (String) - Label / heading prefix
+- `content` (Text) - Announcement message text
+- `style` (String) - Severity style: `info`, `warning`, `danger`, `success`
+- `is_active` (Boolean) - Visibility switch
+- `starts_at` (Timestamp, Nullable) - Scheduled start time
+- `ends_at` (Timestamp, Nullable) - Scheduled expiration time
+- `created_by` (BigInt, Foreign Key to `users.id`)
+- `timestamps` (`created_at`, `updated_at`)
+
 ---
 
 ## 🎨 Coding Conventions & Path Mapping
