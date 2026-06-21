@@ -118,6 +118,7 @@ class UserController extends Controller
             'roles' => 'required|array',
             'roles.*' => 'string|exists:roles,name',
             'avatar' => 'nullable|image|max:2048', // max 2MB
+            'email_verified' => 'required|boolean',
         ]);
 
         $this->authorizeRoleAssignment(request()->user(), $request->input('roles'));
@@ -134,6 +135,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'avatar' => $avatarPath,
+            'email_verified_at' => $request->boolean('email_verified') ? now() : null,
         ]);
 
         // Sync roles
@@ -190,6 +192,7 @@ class UserController extends Controller
             'roles.*' => 'string|exists:roles,name',
             'avatar' => 'nullable|image|max:2048',
             'remove_avatar' => 'nullable|boolean',
+            'email_verified' => 'required|boolean',
         ]);
 
         $this->authorizeRoleAssignment(request()->user(), $request->input('roles'));
@@ -199,6 +202,7 @@ class UserController extends Controller
             'username' => $user->username,
             'email' => $user->email,
             'roles' => $user->getRoleNames()->all(),
+            'email_verified_at' => $user->email_verified_at,
         ];
 
         if ($request->boolean('remove_avatar') && $user->avatar) {
@@ -217,6 +221,11 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->username = $request->username;
         $user->email = $request->email;
+
+        // Prevent self-deverification to protect admin layout session
+        if ($request->has('email_verified') && $user->id !== auth()->id()) {
+            $user->email_verified_at = $request->boolean('email_verified') ? ($user->email_verified_at ?? now()) : null;
+        }
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

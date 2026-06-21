@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -9,6 +9,7 @@ import { AvatarInitials } from '@/Components/ui/avatar-initials';
 import { ArrowLeft, Check, Key, Mail, Shield, User, UserCheck, Eye, EyeOff, Sparkles, Copy } from 'lucide-react';
 import InputError from '@/Components/InputError';
 import { toast } from 'sonner';
+import { Switch } from '@/Components/ui/switch';
 
 interface Role {
     id: number;
@@ -22,6 +23,7 @@ interface User {
     email: string;
     avatar: string | null;
     roles: Role[];
+    email_verified_at?: string | null;
 }
 
 interface CreateEditProps {
@@ -31,6 +33,8 @@ interface CreateEditProps {
 
 export default function CreateEdit({ user, roles }: CreateEditProps) {
     const isEdit = !!user;
+    const { auth } = usePage().props as any;
+    const currentUser = auth.user;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar || null);
     
@@ -51,6 +55,7 @@ export default function CreateEdit({ user, roles }: CreateEditProps) {
         roles: user ? user.roles.map((r) => r.name) : ['user'],
         avatar: null as File | null,
         remove_avatar: false,
+        email_verified: user ? !!user.email_verified_at : true,
     });
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,48 +182,78 @@ export default function CreateEdit({ user, roles }: CreateEditProps) {
                 </div>
 
                 <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-3">
-                    {/* Left Column: Avatar Management */}
-                    <Card className="h-fit shadow-sm bg-card/60 backdrop-blur-md">
-                        <CardHeader className="text-center">
-                            <CardTitle className="text-lg">Profile Avatar</CardTitle>
-                            <CardDescription>Upload a custom image or use name-based initials fallback.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center gap-4">
-                            <div className="relative group">
-                                <AvatarInitials
-                                    name={data.name || 'User Preview'}
-                                    avatarUrl={avatarPreview}
-                                    size="xl"
-                                    className="h-28 w-28 text-3xl shadow-md border-4 border-background"
+                    {/* Left Column: Avatar & Account Status */}
+                    <div className="space-y-6">
+                        <Card className="h-fit shadow-sm bg-card/60 backdrop-blur-md">
+                            <CardHeader className="text-center">
+                                <CardTitle className="text-lg">Profile Avatar</CardTitle>
+                                <CardDescription>Upload a custom image or use name-based initials fallback.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex flex-col items-center gap-4">
+                                <div className="relative group">
+                                    <AvatarInitials
+                                        name={data.name || 'User Preview'}
+                                        avatarUrl={avatarPreview}
+                                        size="xl"
+                                        className="h-28 w-28 text-3xl shadow-md border-4 border-background"
+                                    />
+                                </div>
+
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    accept="image/*"
+                                    className="hidden"
                                 />
-                            </div>
 
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                accept="image/*"
-                                className="hidden"
-                            />
-
-                            <div className="flex flex-col gap-2 w-full">
-                                <Button type="button" variant="outline" onClick={triggerFileSelect} className="w-full">
-                                    Upload Image
-                                </Button>
-                                {avatarPreview && (
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        onClick={handleRemoveAvatar}
-                                        className="text-destructive hover:bg-destructive/5 hover:text-destructive w-full"
-                                    >
-                                        Remove Avatar
+                                <div className="flex flex-col gap-2 w-full">
+                                    <Button type="button" variant="outline" onClick={triggerFileSelect} className="w-full">
+                                        Upload Image
                                     </Button>
+                                    {avatarPreview && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={handleRemoveAvatar}
+                                            className="text-destructive hover:bg-destructive/5 hover:text-destructive w-full"
+                                        >
+                                            Remove Avatar
+                                        </Button>
+                                    )}
+                                </div>
+                                <InputError message={errors.avatar} className="text-center" />
+                            </CardContent>
+                        </Card>
+
+                        <Card className="h-fit shadow-sm bg-card/60 backdrop-blur-md">
+                            <CardHeader>
+                                <CardTitle className="text-base">Account Status</CardTitle>
+                                <CardDescription>Manage user verification and email activation status.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/10">
+                                    <div className="flex flex-col gap-0.5">
+                                        <Label htmlFor="email_verified" className="text-sm font-semibold cursor-pointer">Email Verified</Label>
+                                        <span className="text-[10px] text-muted-foreground">
+                                            Mark account as verified and active.
+                                        </span>
+                                    </div>
+                                    <Switch
+                                        id="email_verified"
+                                        checked={data.email_verified}
+                                        onCheckedChange={(checked) => setData('email_verified', checked)}
+                                        disabled={user?.id === currentUser?.id}
+                                    />
+                                </div>
+                                {user?.id === currentUser?.id && (
+                                    <p className="text-[10px] text-amber-500 font-medium leading-normal">
+                                        Note: You cannot toggle your own verification status.
+                                    </p>
                                 )}
-                            </div>
-                            <InputError message={errors.avatar} className="text-center" />
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    </div>
 
                     {/* Right Column: User Details and Roles */}
                     <div className="md:col-span-2 space-y-6">
