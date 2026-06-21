@@ -1,64 +1,64 @@
 # Laravel + Inertia.js (React + TypeScript) Starter Kit
 
-Sistem asas (*starter kit*) ini merupakan aplikasi portal pentadbiran premium yang dibina menggunakan gabungan Laravel 11/12, Inertia.js, React (TypeScript), Tailwind CSS v4, dan Shadcn UI. Sistem ini menyediakan asas modular yang kukuh untuk pembangunan aplikasi web perusahaan.
+This starter kit is a premium administration portal application built using a combination of Laravel 11/12, Inertia.js, React (TypeScript), Tailwind CSS v4, and Shadcn UI. It provides a solid, modular foundation for building enterprise web applications.
 
 ---
 
-## 🚀 Status Semasa & Modul Sistem (System Modules)
+## 🚀 Current Status & System Modules
 
-Sistem ini telah lengkap dibangunkan, diuji kompilasinya, dan mempunyai modul-modul berikut:
+The system is fully developed, compiled, and features the following modules:
 
-### 1. 📂 Pengurus Media (Media Manager) - Versi Pelepasan `v2.0.0`
-* **Pustaka Media Berpusat:** Ruang panel interaktif untuk memuat naik, mencari, dan menapis aset fail sistem.
-* **Sokongan Folder Maya:** Mengkategorikan fail secara logik ke dalam folder maya tanpa mengubah struktur fizikal fail.
-* **Drag-and-Drop Uploader:** Zon seretan fail yang lancar untuk muat naik fail pantas sehingga 10MB.
-* **Pemadaman Pukal (Bulk Actions):** Keupayaan untuk memilih berbilang fail dan memadamkannya secara serentak.
-* **Komponen MediaSelector Modal:** Komponen popover dialog yang boleh diguna semula untuk memilih aset logo/favicon dari pustaka media dalam mana-mana form input.
+### 1. 📂 Media Manager - Release Version `v2.0.0`
+* **Centralized Media Library:** An interactive dashboard panel to upload, search, and filter system file assets.
+* **Virtual Folder Support:** Organize files logically into virtual directories without modifying the physical disk file structure.
+* **Drag-and-Drop Uploader:** Seamless dropzone area for fast file uploads of up to 10MB.
+* **Bulk Actions:** Ability to select multiple files and delete them simultaneously in a single batch.
+* **MediaSelector Dialog Modal:** A reusable React dialog component to pick media library assets from any form input page.
 
-### 2. ⚙️ Pengurusan Tetapan Branding & Sistem
-* **Live Branding Preview:** Panel simulasi masa-nyata (*sticky card preview*) untuk melihat perubahan Logo (Lucide Icon vs Fail Gambar), Favicon, dan Nama Aplikasi pada sidebar, tab pelayar, dan halaman log masuk secara langsung sebelum disimpan.
-* **Pusat Kandungan Reka Letak:** Seluruh halaman tetapan branding diselaraskan ke kedudukan tengah (`mx-auto max-w-5xl`) untuk memaksimumkan visual pada monitor skrin lebar.
-* **Butang Simpan di Header Atas:** Butang *Save Settings* dialih ke bahagian atas kanan header menggunakan rujukan atribut `form="settings-form"` untuk kemudahan simpanan yang pantas tanpa perlu skrol ke bawah.
-* **Pembersihan Cache Sistem:** Utiliti butang pantas untuk mengosongkan cache aplikasi, cache laluan (*routes*), cache *views*, serta optimisasi fail sistem secara berpusat.
-* **Konfigurasi SMTP & Ujian Hubungan:** Antara muka tetapan mel (driver SMTP/Log) dilengkapi dengan butang **Test SMTP Connection** untuk mengesahkan parameter emel secara langsung.
+### 2. ⚙️ System & Branding Settings
+* **Live Branding Preview:** A real-time sticky card simulating how branding inputs (App Name, Logo type - Lucide Icon vs Custom Image, Favicon) look in the sidebar, browser tab, and login screen before saving.
+* **Layout Centering:** The entire system settings page is centered (`mx-auto max-w-5xl`) to maximize visual appearance on wide viewports.
+* **Top Header Action Bar:** Relocated the *Save Settings* submit button to the top-right header section using the `form="settings-form"` reference, providing quick action without scrolling to the bottom.
+* **System Cache Utilities:** Quick action buttons to clear application cache, route cache, view cache, and run full system optimization.
+* **SMTP Configuration & Connection Testing:** Setup SMTP relay credentials with a **Test SMTP Connection** button to verify email parameters instantly.
 
-### 3. 👥 Pengurusan Pengguna & Peranan (Users & Roles CRUD)
-* **Profil & Akses Klien:** Pendaftaran, kemaskini profil, penukaran avatar, dan pemadaman pengguna.
-* **Kawalan Peranan (Roles & Permissions):** Sistem penetapan peranan (`Superadmin`, `Admin`, `Manager`, `User`) berasaskan kotak pilihan interaktif.
-* **Export Profil:** Utiliti mengeksport data profil pengguna yang dipilih ke dalam format fail CSV.
-* **Sokongan 2FA:** Penyepaduan Pengesahan Dua Faktor (*Two-Factor Authentication*) untuk kawalan keselamatan tinggi.
+### 3. 👥 User & Access Role Management (Users & Roles CRUD)
+* **Profiles & Client Access:** Account registrations, profile updates, custom avatar replacements, and profile deletions.
+* **Roles & Permissions Control:** Manage system roles (`Superadmin`, `Admin`, `Manager`, `User`) utilizing interactive selection controls.
+* **Profile CSV Export:** Utility to export selected user profiles into structured CSV files.
+* **Two-Factor Authentication (2FA):** Integrated 2FA controls for enhanced user account security.
 
-### 4. 📈 Papan Pemuka, Telemetri & Log Audit
-* **Statistik Utama:** Kad status visual menunjukkan bilangan keseluruhan profil, pentadbir, status verifikasi emel, dan barisan tugasan.
-* **Pemberitahuan Sistem:** Senarai notifikasi penting sistem berserta fungsi padam semua dan tandakan telah dibaca.
-* **Widget Telemetri Sistem:** Paparan peratusan penggunaan CPU, RAM, dan Kapasiti Disk secara *real-time*.
-* **Log Audit Aktiviti:** Jejak audit komprehensif merekodkan sebarang aktiviti sistem berserta data sebelum/selepas perubahan dan IP alamat pengguna.
+### 4. 📈 Dashboard, Telemetry & Audit Logs
+* **Core Metrics Grid:** Visual metric cards showing total user profiles, administrators, email verification statuses, and system pending tasks.
+* **System Notifications:** A notification center with actions to mark notifications as read or clear all logs.
+* **System Telemetry Widget:** Real-time percentage bars for host CPU, RAM, and Disk storage capacity utilization.
+* **Activity Audit Logs:** Comprehensive event tracker recording user interactions along with before/after state diff snapshots and client IP addresses.
 
-### 5. 🛠️ Diagnostik & Sandaran (System Backups & Logs)
-* **Log Reader Dashboard:** Panel membaca fail log Laravel secara langsung dari panel admin tanpa perlu membuka fail `.log` secara manual.
-* **Backup Manager:** Utiliti menjana arkib sandaran fail dan pangkalan data sistem, memuat turun arkib `.zip`, dan memadam fail sandaran lama.
-* **Health Monitor Dashboard:** Metrik kesihatan pangkalan data, sambungan pelayan, dan status cache.
+### 5. 🛠️ Diagnostics & Backups (System Backups & Logs)
+* **Log Reader Dashboard:** Read Laravel file logs directly in the admin panel without manual access to physical log directories.
+* **Backup Manager:** Generate database and filesystem backup archives, download zip assets, and delete old archive files.
+* **Health Monitor Panel:** Monitor database connection stability, cache stores, and server states.
 
-### 6. 📜 Garis Masa Changelogs (Versi Sistem)
-* **Accordion Changelogs UI:** Papan paparan log versi sistem yang kemas menggunakan elemen Accordion Radix UI. Nota pelepasan terkini dipaparkan secara automatik manakala versi lama boleh dikembangkan secara interaktif untuk menjimatkan ruang halaman.
+### 6. 📜 Versioning Changelogs Timeline
+* **Accordion Changelogs UI:** Clean timeline layout utilizing Radix Accordion components. The latest release notes are expanded by default while older updates are collapsed automatically to conserve scrolling space.
 
 ---
 
-## 🛠️ Pemasangan & Persediaan Pelayan (Installation)
+## 🛠️ Installation & Setup
 
-Ikuti langkah-langkah berikut untuk menjalankan projek ini di persekitaran tempatan anda:
+Follow these steps to set up and run the project locally on your system:
 
-### 1. Klon Repositori & Pasang Dependensi
+### 1. Clone the Repository & Install Dependencies
 ```bash
-# Pasang dependensi PHP (Composer)
+# Install PHP dependencies (Composer)
 composer install
 
-# Pasang dependensi Frontend (NPM)
+# Install Frontend dependencies (NPM)
 npm install
 ```
 
-### 2. Konfigurasi Fail Persekitaran (.env)
-Salin fail `.env.example` kepada `.env` dan kemaskini konfigurasi pangkalan data MySQL anda:
+### 2. Configure Environment variables (.env)
+Copy `.env.example` to `.env` and configure your database parameters (MySQL is default):
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -68,28 +68,28 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 3. Jana Kunci Aplikasi & Jalankan Migrasi
+### 3. Generate Application Key & Run Migrations
 ```bash
-# Jana APP_KEY
+# Generate APP_KEY
 php artisan key:generate
 
-# Jalankan migrasi pangkalan data berserta seeders (Pengguna, Peranan & Changelogs)
+# Run database migrations and seed default data (Users, Roles & Changelogs)
 php artisan migrate:fresh --seed
 ```
 
-### 4. Jalankan Pelayan Tempatan
+### 4. Start the Local Server Processes
 ```bash
-# Jalankan Laravel Dev Server (Terminal 1)
+# Run Laravel development server (Terminal 1)
 php artisan serve
 
-# Jalankan Vite Hot Dev Server (Terminal 2)
+# Run Vite Hot Dev server (Terminal 2)
 npm run dev
 ```
 
-Kini aplikasi anda boleh diakses melalui laman tempatan: `http://127.0.0.1:8000` atau `http://laravel.test/`.
+The application will be accessible at: `http://127.0.0.1:8000` (or your local alias `http://laravel.test/`).
 
 ---
 
-## 🎨 Konvensyen Kod Fail (Coding Conventions)
+## 🎨 Coding Conventions & Architecture
 
-Sila rujuk fail **[PROJECT_MAP.md](PROJECT_MAP.md)** untuk melihat struktur folder core, skema pangkalan data penuh, peraturan penamaan fail, dan alias import TypeScript `@/` bagi mengekalkan konsistensi kod.
+Please refer to **[PROJECT_MAP.md](PROJECT_MAP.md)** to inspect directory structures, full database schema tables, file-naming rules, and TypeScript import path aliases (`@/`).
