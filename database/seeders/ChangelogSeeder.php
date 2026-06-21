@@ -106,5 +106,34 @@ class ChangelogSeeder extends Seeder
                 ['type' => 'Improved', 'content' => 'Upgraded GuestLayout with glassmorphic cards and soft glowing background blur blobs.'],
             ],
         ]);
+
+        Changelog::create([
+            'version' => 'v1.7.0',
+            'title' => 'Notifications Module Polish',
+            'description' => 'Polished the system notifications dashboard with visual categories, unread filtering tabs, individual trash tools, and bulk cleanup controls.',
+            'release_date' => '2026-06-21',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'Dynamic tab filtering separating unread alerts from historical logs.'],
+                ['type' => 'Added', 'content' => 'Contextual icons and color-coded status badges for security, settings, and profile updates.'],
+                ['type' => 'Added', 'content' => 'Single row trash deletion and bulk clear notifications panel.'],
+                ['type' => 'Improved', 'content' => 'Synchronized dropdown header widget with live count indicators.'],
+            ],
+        ]);
+
+        Changelog::create([
+            'version' => 'v1.8.0',
+            'title' => 'System Administration Expansion Pack',
+            'description' => 'Introduced premium administration features: Two-Factor Authentication, browser device session manager, custom portable database backup utility, visual log reader, and an OS-aware server health monitor.',
+            'release_date' => '2026-06-21',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'Two-Factor Authentication (2FA) with secure OTP QR code activation.'],
+                ['type' => 'Added', 'content' => 'Active browser sessions list with direct remote device logout capabilities.'],
+                ['type' => 'Added', 'content' => 'Custom portable Database Backup Manager supporting downloads and deletions.'],
+                ['type' => 'Added', 'content' => 'Laravel System Log Reader with memory-safe reading and expandable stack traces.'],
+                ['type' => 'Added', 'content' => 'OS-Aware Server Health Monitor with progress gauges checking CPU, RAM, disk, database, and Laravel caches.'],
+            ],
+        ]);
     }
 }

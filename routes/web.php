@@ -6,6 +6,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SystemSettingsController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\LogReaderController;
+use App\Http\Controllers\HealthMonitorController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,10 +26,17 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'create'])->name('two-factor.login');
+Route::post('two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'store']);
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/two-factor', [ProfileController::class, 'enableTwoFactor'])->name('profile.two-factor.enable');
+    Route::post('/profile/two-factor/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('profile.two-factor.confirm');
+    Route::post('/profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
+    Route::post('/profile/sessions/logout', [ProfileController::class, 'logoutOtherDevices'])->name('profile.sessions.logout');
 
     // Admin CRUD routes
     Route::post('dashboard/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
@@ -52,6 +62,18 @@ Route::middleware('auth')->group(function () {
     Route::post('dashboard/changelogs', [\App\Http\Controllers\ChangelogController::class, 'store'])->name('changelogs.store');
     Route::put('dashboard/changelogs/{changelog}', [\App\Http\Controllers\ChangelogController::class, 'update'])->name('changelogs.update');
     Route::delete('dashboard/changelogs/{changelog}', [\App\Http\Controllers\ChangelogController::class, 'destroy'])->name('changelogs.destroy');
+
+    // System Diagnostics & Admin Expansion Modules
+    Route::get('dashboard/backups', [BackupController::class, 'index'])->name('backups.index');
+    Route::post('dashboard/backups', [BackupController::class, 'create'])->name('backups.create');
+    Route::get('dashboard/backups/{filename}/download', [BackupController::class, 'download'])->name('backups.download');
+    Route::delete('dashboard/backups/{filename}', [BackupController::class, 'destroy'])->name('backups.destroy');
+
+    Route::get('dashboard/logs', [LogReaderController::class, 'index'])->name('logs.index');
+    Route::get('dashboard/logs/download', [LogReaderController::class, 'download'])->name('logs.download');
+    Route::delete('dashboard/logs', [LogReaderController::class, 'destroy'])->name('logs.destroy');
+
+    Route::get('dashboard/health', [HealthMonitorController::class, 'index'])->name('health.index');
 });
 
 require __DIR__.'/auth.php';

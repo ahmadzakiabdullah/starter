@@ -12,6 +12,7 @@
         "laravel/mcp": "^0.8.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
+        "pragmarx/google2fa": "^9.0",
         "spatie/laravel-permission": "^8.0",
         "tightenco/ziggy": "^2.0"
     },

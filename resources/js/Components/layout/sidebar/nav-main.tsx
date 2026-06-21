@@ -282,6 +282,55 @@ export function NavMain() {
           </SidebarGroupContent>
         </SidebarGroup>
       )}
+
+      {canManageSettings && (
+        <SidebarGroup>
+          <SidebarGroupLabel>System Diagnostics</SidebarGroupLabel>
+          <SidebarGroupContent className="flex flex-col gap-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="hover:text-foreground active:text-foreground hover:bg-[var(--primary)]/10 active:bg-[var(--primary)]/10"
+                  isActive={pathname.startsWith('/dashboard/health')}
+                  tooltip="Server Health"
+                  asChild
+                >
+                  <Link href={route('health.index')}>
+                    <GaugeIcon className="h-4 w-4" />
+                    <span>Server Health</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="hover:text-foreground active:text-foreground hover:bg-[var(--primary)]/10 active:bg-[var(--primary)]/10"
+                  isActive={pathname.startsWith('/dashboard/backups')}
+                  tooltip="Database Backups"
+                  asChild
+                >
+                  <Link href={route('backups.index')}>
+                    <ArchiveRestoreIcon className="h-4 w-4" />
+                    <span>Database Backups</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="hover:text-foreground active:text-foreground hover:bg-[var(--primary)]/10 active:bg-[var(--primary)]/10"
+                  isActive={pathname.startsWith('/dashboard/logs')}
+                  tooltip="Log Reader"
+                  asChild
+                >
+                  <Link href={route('logs.index')}>
+                    <ClipboardMinusIcon className="h-4 w-4" />
+                    <span>Log Reader</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      )}
     </>
   );
 }
