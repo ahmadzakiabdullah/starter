@@ -4,6 +4,18 @@ All notable changes to this Laravel + Inertia (React + TypeScript) project will 
 
 ---
 
+## [2.1.0] - 2026-06-21
+
+### Added
+- **User Active Sessions Monitor**: Track active login session devices from database rows. Parse user agents into readable Browser/OS/Device formats and enable remote session revoking (individual or bulk).
+- **Multi-theme & Color Switcher**: Dropdown in the header to select theme modes (light, dark, system) and theme color presets (Default, Underground, Sunset Glow, etc.) in real time.
+- **Global Announcement Broadcast Banner**: Admin-managed notification alert system. Includes CRUD management tab, database model/migration, global shared props, and a responsive banner layout with session-based dismissal.
+- **API Access Keys Manager**: Personal Access Token management using Laravel Sanctum. Generate new tokens (displaying plain text key once), copy keys to clipboard, list active tokens, and revoke access keys.
+- **Live Telemetry Charts**: Refactored the dashboard system diagnostics widget to display an animating Recharts Area Chart plotting CPU and RAM load curves dynamically.
+
+### Fixed
+- **Sidebar Dropdown User Account Link**: Linked the "Account" item in the user menu dropdown to the profile settings page so that users can easily manage their sessions and API keys.
+
 ## [2.0.0] - 2026-06-21
 
 ### Added

@@ -166,5 +166,21 @@ class ChangelogSeeder extends Seeder
                 ['type' => 'Added', 'content' => 'Database migrations for storage file tracking.'],
             ],
         ]);
+
+        Changelog::create([
+            'version' => 'v2.1.0',
+            'title' => 'System Premium Features Expansion',
+            'description' => 'Upgraded the system with 5 premium modules: Active Browser Sessions monitor, multi-theme and custom color switcher dropdown, admin-managed global broadcast banners, dynamic Recharts CPU/RAM telemetry graphs, and Sanctum API Access Keys manager.',
+            'release_date' => '2026-06-21',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'Active Sessions Monitor with readable device details and remote revoke tools.'],
+                ['type' => 'Added', 'content' => 'Multi-theme dropdown switcher rendering themes and color presets.'],
+                ['type' => 'Added', 'content' => 'Global Announcement Broadcast Banner with admin settings CRUD panel.'],
+                ['type' => 'Added', 'content' => 'Live Telecharts plotting memory and processor load with simulation loops.'],
+                ['type' => 'Added', 'content' => 'API Access Keys Manager generating and revoking Sanctum tokens.'],
+                ['type' => 'Fixed', 'content' => 'Stitched User Account navigation link in user sidebar dropdown.'],
+            ],
+        ]);
     }
 }
