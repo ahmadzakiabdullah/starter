@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Changelog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,14 +14,14 @@ class ChangelogController extends Controller
 {
     public function index(Request $request): Response
     {
-        Changelog::syncFromGit();
 
         $changelogs = Changelog::query()
             ->orderBy('release_date', 'desc')
             ->orderBy('id', 'desc')
             ->get();
 
-        $canManage = $request->user()?->hasRole('superadmin') ?? false;
+        $canManage = $request->user() !== null
+            && Gate::forUser($request->user())->allows('manage-changelog');
 
         return Inertia::render('Admin/Changelog/Index', [
             'changelogs' => $changelogs,
@@ -30,7 +31,7 @@ class ChangelogController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-changelog');
 
         $validated = $request->validate([
             'version' => 'required|string|unique:changelogs,version|max:30|regex:/^v?\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$/',
@@ -47,8 +48,8 @@ class ChangelogController extends Controller
         ]);
 
         // Standardize version prepending 'v' if not present
-        if (!str_starts_with($validated['version'], 'v')) {
-            $validated['version'] = 'v' . $validated['version'];
+        if (! str_starts_with($validated['version'], 'v')) {
+            $validated['version'] = 'v'.$validated['version'];
         }
 
         $changelog = Changelog::create($validated);
@@ -67,10 +68,10 @@ class ChangelogController extends Controller
 
     public function update(Request $request, Changelog $changelog): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-changelog');
 
         $validated = $request->validate([
-            'version' => 'required|string|max:30|regex:/^v?\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$/|unique:changelogs,version,' . $changelog->id,
+            'version' => 'required|string|max:30|regex:/^v?\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$/|unique:changelogs,version,'.$changelog->id,
             'title' => 'required|string|max:150',
             'description' => 'nullable|string|max:1000',
             'release_date' => 'required|date',
@@ -84,8 +85,8 @@ class ChangelogController extends Controller
         ]);
 
         // Standardize version prepending 'v' if not present
-        if (!str_starts_with($validated['version'], 'v')) {
-            $validated['version'] = 'v' . $validated['version'];
+        if (! str_starts_with($validated['version'], 'v')) {
+            $validated['version'] = 'v'.$validated['version'];
         }
 
         $oldData = $changelog->toArray();
@@ -105,11 +106,11 @@ class ChangelogController extends Controller
 
     public function destroy(Request $request, Changelog $changelog): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-changelog');
 
         $version = $changelog->version;
         $oldData = $changelog->toArray();
-        
+
         $changelog->delete();
 
         AuditLog::record(

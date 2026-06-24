@@ -28,6 +28,7 @@ class UserManagementAuthorizationTest extends TestCase
             'email' => 'escalation@example.com',
             'password' => 'Password123!',
             'roles' => [$superadmin->name],
+            'email_verified' => true,
         ]);
 
         $response->assertForbidden();

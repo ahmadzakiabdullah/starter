@@ -2,6 +2,8 @@
 
 namespace App\Mcp\Servers;
 
+use App\Mcp\Tools\ApplicationStatus;
+use App\Mcp\Tools\UserSummary;
 use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
@@ -13,8 +15,8 @@ use Laravel\Mcp\Server\Attributes\Version;
 class LaravelServer extends Server
 {
     protected array $tools = [
-        \App\Mcp\Tools\ApplicationStatus::class,
-        \App\Mcp\Tools\UserSummary::class,
+        ApplicationStatus::class,
+        UserSummary::class,
     ];
 
     protected array $resources = [

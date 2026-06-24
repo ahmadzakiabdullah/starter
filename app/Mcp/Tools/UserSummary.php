@@ -2,13 +2,13 @@
 
 namespace App\Mcp\Tools;
 
-use Illuminate\Contracts\JsonSchema\JsonSchema;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
+use Spatie\Permission\Models\Role;
 
 #[Description('Return aggregate user and role counts without exposing personal data.')]
 class UserSummary extends Tool

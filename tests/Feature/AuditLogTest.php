@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\AuditLog;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -17,7 +17,7 @@ class AuditLogTest extends TestCase
         $role = Role::create(['name' => 'superadmin']);
         $superadmin = User::factory()->create(['name' => 'Super Admin', 'username' => 'superadmin']);
         $superadmin->assignRole($role);
-        
+
         $regularUser = User::factory()->create();
 
         $this->actingAs($regularUser)
@@ -119,7 +119,7 @@ class AuditLogTest extends TestCase
         // Verify that a purge record itself has been logged!
         $this->assertDatabaseHas('audit_logs', [
             'event' => 'audit_log.purged',
-            'user_id' => $superadmin->id
+            'user_id' => $superadmin->id,
         ]);
     }
 }

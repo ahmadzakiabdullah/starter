@@ -855,26 +855,37 @@ body {
 /* Font */
 [data-theme-font="inter"] {
     --font-sans: var(--font-inter);
+    --text-family: var(--font-inter);
+}
+
+[data-theme-font="geist"] {
+    --font-sans: var(--font-geist);
+    --text-family: var(--font-geist);
 }
 
 [data-theme-font="roboto"] {
     --font-sans: var(--font-roboto);
+    --text-family: var(--font-roboto);
 }
 
 [data-theme-font="poppins"] {
     --font-sans: var(--font-poppins);
+    --text-family: var(--font-poppins);
 }
 
 [data-theme-font="montserrat"] {
     --font-sans: var(--font-montserrat);
+    --text-family: var(--font-montserrat);
 }
 
 [data-theme-font="pt-sans"] {
     --font-sans: var(--font-pt-sans);
+    --text-family: var(--font-pt-sans);
 }
 
 [data-theme-font="overpass-mono"] {
     --font-sans: var(--font-overpass-mono);
+    --text-family: var(--font-overpass-mono);
     letter-spacing: -.05em;
 }
 /* Font */

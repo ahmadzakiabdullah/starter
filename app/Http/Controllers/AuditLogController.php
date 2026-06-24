@@ -21,11 +21,11 @@ class AuditLogController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
-                  ->orWhere('event', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%")
-                        ->orWhere('username', 'like', "%{$search}%");
-                  });
+                    ->orWhere('event', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                            ->orWhere('username', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -71,7 +71,7 @@ class AuditLogController extends Controller
                 'event' => $request->input('event'),
                 'date_from' => $request->input('date_from'),
                 'date_to' => $request->input('date_to'),
-            ]
+            ],
         ]);
     }
 
@@ -80,7 +80,7 @@ class AuditLogController extends Controller
         Gate::authorize('manage-roles');
 
         $request->validate([
-            'days' => 'required|integer|in:30,60,90'
+            'days' => 'required|integer|in:30,60,90',
         ]);
 
         $days = (int) $request->input('days');

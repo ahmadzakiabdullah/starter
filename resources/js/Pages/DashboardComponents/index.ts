@@ -1,10 +1,3 @@
-export * from "./chat-widget";
-export * from "./payment-method";
-export * from "./theme-members";
-export * from "./exercise-minutes";
-export * from "./total-revenue";
-export * from "./latest-payments";
-export * from "./subscriptions";
 export { default as AdminStatsGrid } from "./AdminStatsGrid";
 export { default as TelemetryWidget } from "./TelemetryWidget";
 export { default as RecentActivityWidget } from "./RecentActivityWidget";

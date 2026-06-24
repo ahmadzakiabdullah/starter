@@ -36,6 +36,7 @@ interface SettingsProps {
         timezone: string;
         date_format: string;
         default_theme: string;
+        system_font?: string;
         default_language: string;
         email_notifications: boolean;
         enable_registration: boolean;
@@ -96,6 +97,7 @@ export default function Edit({ settings, announcements }: SettingsProps) {
         timezone: settings.timezone ?? 'Asia/Kuala_Lumpur',
         date_format: settings.date_format ?? 'Y-m-d',
         default_theme: settings.default_theme ?? 'system',
+        system_font: settings.system_font ?? 'inter',
         default_language: settings.default_language ?? 'en',
         email_notifications: !!settings.email_notifications,
         enable_registration: !!settings.enable_registration,
@@ -314,6 +316,32 @@ export default function Edit({ settings, announcements }: SettingsProps) {
                                                     </SelectContent>
                                                 </Select>
                                                 <InputError message={errors.default_theme} />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="system_font">System Font</Label>
+                                                <Select
+                                                    value={data.system_font}
+                                                    onValueChange={(value) => {
+                                                        setData('system_font', value);
+                                                        document.body.setAttribute('data-theme-font', value);
+                                                    }}
+                                                >
+                                                    <SelectTrigger id="system_font"><SelectValue /></SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="inter">Inter — clean and modern</SelectItem>
+                                                        <SelectItem value="geist">Geist — contemporary</SelectItem>
+                                                        <SelectItem value="roboto">Roboto — familiar and readable</SelectItem>
+                                                        <SelectItem value="poppins">Poppins — rounded and friendly</SelectItem>
+                                                        <SelectItem value="montserrat">Montserrat — geometric</SelectItem>
+                                                        <SelectItem value="pt-sans">PT Sans — practical</SelectItem>
+                                                        <SelectItem value="overpass-mono">Overpass Mono — monospace</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <p className="text-xs text-muted-foreground" style={{ fontFamily: `var(--font-${data.system_font})` }}>
+                                                    Preview: The quick brown fox jumps over the lazy dog.
+                                                </p>
+                                                <InputError message={errors.system_font} />
                                             </div>
                                         </CardContent>
                                     </Card>

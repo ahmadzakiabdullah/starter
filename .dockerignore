@@ -1,0 +1,15 @@
+.git
+.github
+.agents
+.codex
+node_modules
+vendor
+public/build
+public/hot
+storage/logs
+.env
+.env.*
+!.env.production.example
+test-debug.php
+tests
+docs

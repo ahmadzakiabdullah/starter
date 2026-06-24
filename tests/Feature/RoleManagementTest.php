@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class RoleManagementTest extends TestCase
@@ -27,7 +27,7 @@ class RoleManagementTest extends TestCase
             ->assertStatus(200);
 
         $rolesData = $response->viewData('page')['props']['roles'];
-        
+
         $this->assertEquals(1, collect($rolesData)->firstWhere('name', 'superadmin')['users_count']);
         $this->assertEquals(1, collect($rolesData)->firstWhere('name', 'user')['users_count']);
     }
@@ -39,7 +39,7 @@ class RoleManagementTest extends TestCase
         $superadmin->assignRole($superadminRole);
 
         $payload = [
-            'name' => 'view-reports'
+            'name' => 'view-reports',
         ];
 
         $this->actingAs($superadmin)
@@ -76,5 +76,17 @@ class RoleManagementTest extends TestCase
 
         $this->assertDatabaseMissing('permissions', ['id' => $customPerm->id]);
         $this->assertDatabaseHas('audit_logs', ['event' => 'permission.deleted']);
+    }
+
+    public function test_superadmin_can_delete_a_custom_role(): void
+    {
+        $superadmin = User::factory()->create();
+        $superadmin->assignRole(Role::create(['name' => 'superadmin']));
+        $role = Role::create(['name' => 'manager']);
+
+        $this->actingAs($superadmin)->delete(route('roles.destroy', $role))->assertRedirect()->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('roles', ['id' => $role->id]);
+        $this->assertDatabaseHas('audit_logs', ['event' => 'role.deleted']);
     }
 }

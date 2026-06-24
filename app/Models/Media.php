@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Media extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'file_name',
@@ -14,7 +17,7 @@ class Media extends Model
         'path',
         'size',
         'folder',
-        'disk'
+        'disk',
     ];
 
     protected $appends = ['url', 'formatted_size'];
@@ -31,6 +34,7 @@ class Media extends Model
         for ($i = 0; $bytes >= 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

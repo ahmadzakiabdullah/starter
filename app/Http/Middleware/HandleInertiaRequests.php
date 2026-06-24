@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Announcement;
+use App\Models\Changelog;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -63,8 +65,8 @@ class HandleInertiaRequests extends Middleware
                     ]),
             ] : ['unread_count' => 0, 'items' => []],
             'system' => fn () => Setting::values(),
-            'app_version' => fn () => \App\Models\Changelog::latestVersion(),
-            'active_announcement' => fn () => \App\Models\Announcement::active(),
+            'app_version' => fn () => Changelog::latestVersion(),
+            'active_announcement' => fn () => Announcement::active(),
         ];
     }
 }

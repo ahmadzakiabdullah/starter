@@ -22,8 +22,16 @@ interface MediaFile {
     created_at: string;
 }
 
+interface PaginatedMedia {
+    data: MediaFile[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+}
+
 interface IndexProps {
-    files: MediaFile[];
+    files: PaginatedMedia;
     folders: string[];
     filters: {
         search?: string;
@@ -85,6 +93,15 @@ export default function Index({ files, folders, filters }: IndexProps) {
             folder: activeFolder || undefined,
             type: type || undefined,
         }, { preserveState: true });
+    };
+
+    const changePage = (page: number) => {
+        router.get(route('media.index'), {
+            search: search || undefined,
+            folder: activeFolder || undefined,
+            type: activeType || undefined,
+            page,
+        }, { preserveScroll: true, preserveState: true });
     };
 
     // File Upload handlers
@@ -335,7 +352,7 @@ export default function Index({ files, folders, filters }: IndexProps) {
                         </div>
 
                         {/* Files Grid */}
-                        {files.length === 0 ? (
+                        {files.data.length === 0 ? (
                             <div className="text-center py-12 bg-card border rounded-2xl shadow-sm text-muted-foreground">
                                 <Lucide.FolderOpen className="h-12 w-12 mx-auto mb-2 opacity-50" />
                                 <p className="font-semibold text-sm">No assets found</p>
@@ -343,7 +360,7 @@ export default function Index({ files, folders, filters }: IndexProps) {
                             </div>
                         ) : (
                             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {files.map((file) => {
+                                {files.data.map((file) => {
                                     const isImage = file.mime_type.startsWith('image/');
                                     const isChecked = selectedIds.includes(file.id);
                                     const isSelected = selectedFile?.id === file.id;
@@ -437,6 +454,32 @@ export default function Index({ files, folders, filters }: IndexProps) {
                                         </div>
                                     );
                                 })}
+                            </div>
+                        )}
+
+                        {files.last_page > 1 && (
+                            <div className="flex items-center justify-between gap-3">
+                                <p className="text-sm text-muted-foreground">
+                                    Page {files.current_page} of {files.last_page} · {files.total} assets
+                                </p>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={files.current_page === 1}
+                                        onClick={() => changePage(files.current_page - 1)}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={files.current_page === files.last_page}
+                                        onClick={() => changePage(files.current_page + 1)}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
                             </div>
                         )}
                     </div>

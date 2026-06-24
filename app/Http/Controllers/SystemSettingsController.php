@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AuditLog;
+use App\Http\Requests\TestSmtpRequest;
+use App\Http\Requests\UpdateSettingsRequest;
 use App\Models\Announcement;
+use App\Models\AuditLog;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\SystemSettingsUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -18,7 +21,7 @@ class SystemSettingsController extends Controller
 {
     public function edit(): Response
     {
-        abort_unless(request()->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-system');
 
         return Inertia::render('Admin/Settings/Edit', [
             'settings' => Setting::values(),
@@ -26,65 +29,18 @@ class SystemSettingsController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateSettingsRequest $request): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-system');
 
-        $values = $request->validate([
-            // General
-            'app_name' => 'required|string|max:100',
-            'app_description' => 'nullable|string|max:500',
-            'default_theme' => 'required|in:system,light,dark',
-
-            // Regional
-            'timezone' => 'required|timezone',
-            'date_format' => 'required|in:Y-m-d,d/m/Y,m/d/Y',
-            'default_language' => 'required|in:en,ms',
-
-            // Security
-            'email_notifications' => 'required|boolean',
-            'enable_registration' => 'required|boolean',
-            'min_password_length' => 'required|integer|min:4|max:32',
-            'session_lifetime' => 'required|integer|min:1|max:1440',
-
-            // Feature Modules Toggles
-            'module_notifications' => 'required|boolean',
-            'module_active_sessions' => 'required|boolean',
-            'module_theme_presets' => 'required|boolean',
-            'module_announcements' => 'required|boolean',
-            'module_telemetry' => 'required|boolean',
-            'module_api_keys' => 'required|boolean',
-
-            // SMTP
-            'mail_driver' => 'required|in:log,smtp',
-            'mail_host' => 'nullable|required_if:mail_driver,smtp|string',
-            'mail_port' => 'nullable|required_if:mail_driver,smtp|integer|min:1|max:65535',
-            'mail_username' => 'nullable|string',
-            'mail_password' => 'nullable|string',
-            'mail_encryption' => 'required|in:none,ssl,tls',
-            'mail_from_address' => 'required|email',
-            'mail_from_name' => 'required|string|max:100',
-
-            // Maintenance
-            'maintenance_mode' => 'required|boolean',
-            'maintenance_bypass_ip' => 'nullable|string',
-            'maintenance_message' => 'required|string|max:500',
-
-            // Branding
-            'app_logo_type' => 'required|in:icon,image',
-            'app_logo_icon' => 'required_if:app_logo_type,icon|string',
-            'app_logo_image_url' => 'nullable|string',
-            'app_favicon_url' => 'nullable|string',
-            'app_logo_file' => 'nullable|file|image|max:2048',
-            'app_favicon_file' => 'nullable|file|mimes:ico,png,jpg,jpeg,svg|max:1048',
-        ]);
+        $values = $request->validated();
 
         $oldValues = Setting::values();
 
         // Process logo image upload
         if ($request->hasFile('app_logo_file')) {
             $path = $request->file('app_logo_file')->store('branding', 'public');
-            $values['app_logo_image'] = '/storage/' . $path;
+            $values['app_logo_image'] = '/storage/'.$path;
         } else {
             $values['app_logo_image'] = $request->input('app_logo_image_url') ?? ($oldValues['app_logo_image'] ?? '');
         }
@@ -92,7 +48,7 @@ class SystemSettingsController extends Controller
         // Process favicon upload
         if ($request->hasFile('app_favicon_file')) {
             $path = $request->file('app_favicon_file')->store('branding', 'public');
-            $values['app_favicon'] = '/storage/' . $path;
+            $values['app_favicon'] = '/storage/'.$path;
         } else {
             $values['app_favicon'] = $request->input('app_favicon_url') ?? ($oldValues['app_favicon'] ?? '');
         }
@@ -121,20 +77,9 @@ class SystemSettingsController extends Controller
         return back()->with('success', 'System settings updated successfully.');
     }
 
-    public function testSmtp(Request $request)
+    public function testSmtp(TestSmtpRequest $request)
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
-
-        $request->validate([
-            'mail_driver' => 'required|in:log,smtp',
-            'mail_host' => 'nullable|required_if:mail_driver,smtp|string',
-            'mail_port' => 'nullable|required_if:mail_driver,smtp|integer|min:1|max:65535',
-            'mail_username' => 'nullable|string',
-            'mail_password' => 'nullable|string',
-            'mail_encryption' => 'required|in:none,ssl,tls',
-            'mail_from_address' => 'required|email',
-            'mail_from_name' => 'required|string',
-        ]);
+        Gate::authorize('manage-system');
 
         try {
             // Apply runtime configurations
@@ -154,35 +99,35 @@ class SystemSettingsController extends Controller
             }
 
             $user = $request->user();
-            
+
             // Dispatch test email
             Mail::raw(
-                "Hello {$user->name},\n\nThis is a test email sent from the " . config('app.name') . " Settings Panel to verify your mail SMTP configuration.\n\nConnection check: SUCCESSFUL!\n\nBest regards,\nYour Application System",
+                "Hello {$user->name},\n\nThis is a test email sent from the ".config('app.name')." Settings Panel to verify your mail SMTP configuration.\n\nConnection check: SUCCESSFUL!\n\nBest regards,\nYour Application System",
                 function ($message) use ($user) {
                     $message->to($user->email)
-                        ->subject("SMTP Connection Test Successful");
+                        ->subject('SMTP Connection Test Successful');
                 }
             );
 
             return response()->json([
                 'success' => true,
-                'message' => "Test email dispatched successfully to {$user->email}."
+                'message' => "Test email dispatched successfully to {$user->email}.",
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'SMTP Test Failed: ' . $e->getMessage()
+                'message' => 'SMTP Test Failed: '.$e->getMessage(),
             ], 500);
         }
     }
 
     public function clearCache(Request $request): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-system');
 
         $type = $request->validate([
-            'type' => 'required|in:application,route,view,config,all'
+            'type' => 'required|in:application,route,view,config,all',
         ])['type'];
 
         switch ($type) {

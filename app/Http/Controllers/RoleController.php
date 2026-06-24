@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -23,25 +25,20 @@ class RoleController extends Controller
 
         return Inertia::render('Admin/Roles/Index', [
             'roles' => $roles,
-            'permissions' => $permissions
+            'permissions' => $permissions,
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
         Gate::authorize('manage-roles');
 
-        $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name',
-            'permissions' => 'nullable|array'
-        ]);
-
         $role = Role::create([
             'name' => strtolower($request->name),
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         if ($request->has('permissions')) {
@@ -63,7 +60,7 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
         Gate::authorize('manage-roles');
 
@@ -72,16 +69,8 @@ class RoleController extends Controller
             'permissions' => $role->getPermissionNames()->all(),
         ];
 
-        // Prevent modifying the superadmin role name to prevent breaking the system
-        if ($role->name === 'superadmin') {
-            $request->validate([
-                'permissions' => 'nullable|array'
-            ]);
-        } else {
-            $request->validate([
-                'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
-                'permissions' => 'nullable|array'
-            ]);
+        // Prevent modifying the superadmin role name to prevent breaking the system.
+        if ($role->name !== 'superadmin') {
             $role->name = strtolower($request->name);
         }
 
@@ -106,7 +95,7 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Role $role)
+    public function destroy(Request $request, Role $role)
     {
         Gate::authorize('manage-roles');
 
@@ -141,15 +130,15 @@ class RoleController extends Controller
                 'string',
                 'max:100',
                 'unique:permissions,name',
-                'regex:/^[a-z0-9_-]+$/'
-            ]
+                'regex:/^[a-z0-9_-]+$/',
+            ],
         ], [
-            'name.regex' => 'The permission name must only contain lowercase letters, numbers, hyphens, and underscores.'
+            'name.regex' => 'The permission name must only contain lowercase letters, numbers, hyphens, and underscores.',
         ]);
 
         $permission = Permission::create([
             'name' => strtolower($request->name),
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         AuditLog::record(

@@ -3,20 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Services\TelemetryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogReaderController extends Controller
 {
+    public function __construct(
+        private readonly TelemetryService $telemetry,
+    ) {}
+
     /**
      * Display a parsed listing of Laravel system logs.
      */
     public function index(Request $request): Response
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-system');
 
         $filePath = storage_path('logs/laravel.log');
         $logs = [];
@@ -26,14 +32,14 @@ class LogReaderController extends Controller
             $file = new \SplFileObject($filePath, 'r');
             $file->seek(PHP_INT_MAX);
             $totalLines = $file->key();
-            
+
             // Read last 1200 lines to capture multiple logs with stack traces
             $startLine = max(0, $totalLines - 1200);
             $file->seek($startLine);
 
             $currentLog = null;
 
-            while (!$file->eof()) {
+            while (! $file->eof()) {
                 $line = $file->current();
                 $file->next();
 
@@ -71,7 +77,7 @@ class LogReaderController extends Controller
 
         return Inertia::render('Admin/Logs/Index', [
             'logs' => array_slice($logs, 0, 100), // Return latest 100 parsed entries
-            'logSize' => file_exists($filePath) ? $this->formatBytes(filesize($filePath)) : '0 B',
+            'logSize' => file_exists($filePath) ? $this->telemetry->formatBytes(filesize($filePath)) : '0 B',
         ]);
     }
 
@@ -80,11 +86,11 @@ class LogReaderController extends Controller
      */
     public function download(Request $request): BinaryFileResponse|RedirectResponse
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-system');
 
         $filePath = storage_path('logs/laravel.log');
 
-        if (!file_exists($filePath) || filesize($filePath) === 0) {
+        if (! file_exists($filePath) || filesize($filePath) === 0) {
             return back()->with('error', 'Log file is empty or does not exist.');
         }
 
@@ -96,7 +102,7 @@ class LogReaderController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-system');
 
         $filePath = storage_path('logs/laravel.log');
 
@@ -108,25 +114,11 @@ class LogReaderController extends Controller
             $request->user(),
             'system.logs.cleared',
             null,
-            "Cleared system application error log file (laravel.log)",
+            'Cleared system application error log file (laravel.log)',
             [],
             []
         );
 
         return back()->with('success', 'Application log cleared successfully.');
-    }
-
-    /**
-     * Helper to format file sizes.
-     */
-    private function formatBytes(int $bytes, int $precision = 2): string
-    {
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }

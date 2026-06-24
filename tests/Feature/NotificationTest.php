@@ -25,7 +25,7 @@ class NotificationTest extends TestCase
     public function test_user_can_mark_notification_as_read(): void
     {
         $user = User::factory()->create();
-        
+
         $notification = DatabaseNotification::forceCreate([
             'id' => '11111111-1111-1111-1111-111111111111',
             'type' => 'App\Notifications\AccountAccessChanged',
@@ -51,7 +51,7 @@ class NotificationTest extends TestCase
     public function test_user_can_delete_notification(): void
     {
         $user = User::factory()->create();
-        
+
         $notification = DatabaseNotification::forceCreate([
             'id' => '22222222-2222-2222-2222-222222222222',
             'type' => 'App\Notifications\AccountAccessChanged',
@@ -75,7 +75,7 @@ class NotificationTest extends TestCase
     public function test_user_can_clear_all_notifications_history(): void
     {
         $user = User::factory()->create();
-        
+
         DatabaseNotification::forceCreate([
             'id' => '33333333-3333-3333-3333-333333333333',
             'type' => 'App\Notifications\AccountAccessChanged',

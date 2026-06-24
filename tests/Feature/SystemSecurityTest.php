@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
@@ -19,7 +18,7 @@ class SystemSecurityTest extends TestCase
     {
         parent::setUp();
         // Create superadmin role required by routes
-        if (!Role::where('name', 'superadmin')->exists()) {
+        if (! Role::where('name', 'superadmin')->exists()) {
             Role::create(['name' => 'superadmin']);
         }
     }
@@ -30,6 +29,7 @@ class SystemSecurityTest extends TestCase
             'password' => Hash::make('password'),
         ]);
         $user->assignRole('superadmin');
+
         return $user;
     }
 
@@ -97,12 +97,12 @@ class SystemSecurityTest extends TestCase
 
         // 3. Manually create a dummy backup file to test index, download, and delete
         $backupDir = storage_path('app/backups');
-        if (!file_exists($backupDir)) {
+        if (! file_exists($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
 
         $backupFilename = 'backup_test_file.sql';
-        $backupFilepath = $backupDir . '/' . $backupFilename;
+        $backupFilepath = $backupDir.'/'.$backupFilename;
         file_put_contents($backupFilepath, '-- Dummy SQL Backup content');
 
         try {
@@ -214,7 +214,7 @@ class SystemSecurityTest extends TestCase
         $this->assertNull($user->two_factor_secret);
 
         // 3. Submit valid OTP code
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
         $validCode = $google2fa->getCurrentOtp($secret);
 
         $this->actingAs($user)
@@ -249,7 +249,7 @@ class SystemSecurityTest extends TestCase
      */
     public function test_login_intercept_and_two_factor_challenge(): void
     {
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
         $secret = $google2fa->generateSecretKey();
 
         // Create user with 2FA enabled
@@ -332,7 +332,7 @@ class SystemSecurityTest extends TestCase
                 'user_agent' => 'Firefox/Linux',
                 'payload' => 'payload3',
                 'last_activity' => time() - 7200,
-            ]
+            ],
         ]);
 
         // Submit request to revoke other sessions with wrong password
@@ -388,7 +388,7 @@ class SystemSecurityTest extends TestCase
                 'user_agent' => 'Firefox/Linux',
                 'payload' => 'payload3',
                 'last_activity' => time() - 7200,
-            ]
+            ],
         ]);
 
         // Submit request with correct password

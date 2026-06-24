@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -23,6 +23,7 @@ class SystemSettingsTest extends TestCase
             'app_name' => 'Operations Portal',
             'app_description' => 'A customized operations management portal.',
             'default_theme' => 'dark',
+            'system_font' => 'poppins',
             'timezone' => 'Asia/Kuala_Lumpur',
             'date_format' => 'd/m/Y',
             'default_language' => 'ms',
@@ -60,6 +61,7 @@ class SystemSettingsTest extends TestCase
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('settings', ['key' => 'app_name', 'value' => 'Operations Portal']);
+        $this->assertDatabaseHas('settings', ['key' => 'system_font', 'value' => 'poppins']);
         $this->assertDatabaseHas('settings', ['key' => 'min_password_length', 'value' => '10']);
         $this->assertDatabaseHas('settings', ['key' => 'maintenance_mode', 'value' => '1']);
         $this->assertDatabaseHas('audit_logs', ['event' => 'system.settings.updated']);

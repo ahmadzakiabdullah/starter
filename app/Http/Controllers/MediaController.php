@@ -2,23 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UploadMediaRequest;
 use App\Models\AuditLog;
 use App\Models\Media;
+use App\Services\MediaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class MediaController extends Controller
 {
+    public function __construct(
+        private readonly MediaService $media,
+    ) {
+        $this->middleware(function ($request, $next) {
+            Gate::authorize('manage-media');
+
+            return $next($request);
+        });
+    }
+
     public function index(Request $request)
     {
         $query = Media::query()->latest();
 
         // Search name
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         // Folder penapisan
@@ -42,11 +53,17 @@ class MediaController extends Controller
             ->distinct()
             ->pluck('folder');
 
-        $files = $query->get();
+        $files = $query->paginate(24)->withQueryString();
 
-        if ($request->wantsJson() && !$request->header('X-Inertia')) {
+        if ($request->wantsJson() && ! $request->header('X-Inertia')) {
             return response()->json([
-                'files' => $files,
+                'files' => $files->items(),
+                'pagination' => [
+                    'current_page' => $files->currentPage(),
+                    'last_page' => $files->lastPage(),
+                    'per_page' => $files->perPage(),
+                    'total' => $files->total(),
+                ],
                 'folders' => $folders,
             ]);
         }
@@ -58,37 +75,15 @@ class MediaController extends Controller
         ]);
     }
 
-    public function upload(Request $request): RedirectResponse
+    public function upload(UploadMediaRequest $request): RedirectResponse
     {
-        $request->validate([
-            'file' => 'required|file|max:10240', // Max 10MB
-            'folder' => 'nullable|string|max:50',
-        ]);
-
-        $file = $request->file('file');
-        $originalName = $file->getClientOriginalName();
-        $mimeType = $file->getClientMimeType();
-        $size = $file->getSize();
-
-        // Safe unique file name
-        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('media', $fileName, 'public');
-
-        $media = Media::create([
-            'name' => $originalName,
-            'file_name' => $fileName,
-            'mime_type' => $mimeType,
-            'path' => $path,
-            'size' => $size,
-            'folder' => $request->filled('folder') ? trim($request->folder) : null,
-            'disk' => 'public',
-        ]);
+        $media = $this->media->upload($request->file('file'), $request->input('folder'));
 
         AuditLog::record(
             $request->user(),
             'media.uploaded',
             null,
-            "Uploaded media file: {$originalName}.",
+            "Uploaded media file: {$media->name}.",
             [],
             $media->toArray()
         );
@@ -102,10 +97,7 @@ class MediaController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $oldName = $media->name;
-        $media->update([
-            'name' => $request->name,
-        ]);
+        $oldName = $this->media->rename($media, $request->name);
 
         AuditLog::record(
             $request->user(),
@@ -121,13 +113,7 @@ class MediaController extends Controller
 
     public function destroy(Media $media): RedirectResponse
     {
-        // Delete from disk
-        if (Storage::disk($media->disk)->exists($media->path)) {
-            Storage::disk($media->disk)->delete($media->path);
-        }
-
-        $fileName = $media->name;
-        $media->delete();
+        $fileName = $this->media->delete($media);
 
         AuditLog::record(
             request()->user(),
@@ -148,22 +134,15 @@ class MediaController extends Controller
             'ids.*' => 'exists:media,id',
         ]);
 
-        $files = Media::whereIn('id', $request->ids)->get();
-
-        foreach ($files as $media) {
-            if (Storage::disk($media->disk)->exists($media->path)) {
-                Storage::disk($media->disk)->delete($media->path);
-            }
-            $media->delete();
-        }
+        $deletedCount = $this->media->deleteMany($request->ids);
 
         AuditLog::record(
             $request->user(),
             'media.bulk_deleted',
             null,
-            "Bulk deleted " . count($files) . " media files.",
+            "Bulk deleted {$deletedCount} media files.",
             [],
-            ['count' => count($files)]
+            ['count' => $deletedCount]
         );
 
         return back()->with('success', 'Selected files deleted successfully.');

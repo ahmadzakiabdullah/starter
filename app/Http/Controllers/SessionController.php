@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -11,7 +12,8 @@ class SessionController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            abort_unless(\App\Models\Setting::values()['module_active_sessions'] ?? true, 403, 'Active Sessions module is disabled.');
+            abort_unless(Setting::values()['module_active_sessions'] ?? true, 403, 'Active Sessions module is disabled.');
+
             return $next($request);
         });
     }
@@ -29,6 +31,7 @@ class SessionController extends Controller
             ->get()
             ->map(function ($session) use ($currentSessionId) {
                 $agent = $this->parseUserAgent($session->user_agent);
+
                 return [
                     'id' => $session->id,
                     'ip_address' => $session->ip_address,
@@ -42,7 +45,7 @@ class SessionController extends Controller
             });
 
         return response()->json([
-            'sessions' => $sessions
+            'sessions' => $sessions,
         ]);
     }
 
@@ -60,7 +63,7 @@ class SessionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Session revoked successfully.'
+            'message' => 'Session revoked successfully.',
         ]);
     }
 
@@ -79,7 +82,7 @@ class SessionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'All other sessions revoked successfully.'
+            'message' => 'All other sessions revoked successfully.',
         ]);
     }
 
@@ -99,22 +102,22 @@ class SessionController extends Controller
         // Parse OS
         $os = 'Unknown OS';
         $osArray = [
-            '/windows nt 10/i'      => 'Windows 10/11',
-            '/windows nt 6.3/i'     => 'Windows 8.1',
-            '/windows nt 6.2/i'     => 'Windows 8',
-            '/windows nt 6.1/i'     => 'Windows 7',
-            '/windows nt 6.0/i'     => 'Windows Vista',
-            '/windows nt 5.2/i'     => 'Windows Server 2003/XP x64',
-            '/windows nt 5.1/i'     => 'Windows XP',
+            '/windows nt 10/i' => 'Windows 10/11',
+            '/windows nt 6.3/i' => 'Windows 8.1',
+            '/windows nt 6.2/i' => 'Windows 8',
+            '/windows nt 6.1/i' => 'Windows 7',
+            '/windows nt 6.0/i' => 'Windows Vista',
+            '/windows nt 5.2/i' => 'Windows Server 2003/XP x64',
+            '/windows nt 5.1/i' => 'Windows XP',
             '/macintosh|mac os x/i' => 'macOS',
-            '/linux/i'              => 'Linux',
-            '/ubuntu/i'             => 'Ubuntu',
-            '/iphone/i'             => 'iPhone',
-            '/ipod/i'               => 'iPod',
-            '/ipad/i'               => 'iPad',
-            '/android/i'            => 'Android',
-            '/blackberry/i'         => 'BlackBerry',
-            '/webos/i'              => 'Mobile',
+            '/linux/i' => 'Linux',
+            '/ubuntu/i' => 'Ubuntu',
+            '/iphone/i' => 'iPhone',
+            '/ipod/i' => 'iPod',
+            '/ipad/i' => 'iPad',
+            '/android/i' => 'Android',
+            '/blackberry/i' => 'BlackBerry',
+            '/webos/i' => 'Mobile',
         ];
 
         foreach ($osArray as $regex => $value) {
@@ -127,16 +130,16 @@ class SessionController extends Controller
         // Parse Browser
         $browser = 'Unknown Browser';
         $browserArray = [
-            '/msie/i'      => 'Internet Explorer',
-            '/firefox/i'   => 'Firefox',
-            '/safari/i'    => 'Safari',
-            '/chrome/i'    => 'Chrome',
-            '/edge/i'      => 'Edge',
-            '/opera/i'     => 'Opera',
-            '/netscape/i'  => 'Netscape',
-            '/maxthon/i'   => 'Maxthon',
+            '/msie/i' => 'Internet Explorer',
+            '/firefox/i' => 'Firefox',
+            '/safari/i' => 'Safari',
+            '/chrome/i' => 'Chrome',
+            '/edge/i' => 'Edge',
+            '/opera/i' => 'Opera',
+            '/netscape/i' => 'Netscape',
+            '/maxthon/i' => 'Maxthon',
             '/konqueror/i' => 'Konqueror',
-            '/mobile/i'    => 'Handheld Browser',
+            '/mobile/i' => 'Handheld Browser',
         ];
 
         foreach ($browserArray as $regex => $value) {
@@ -183,15 +186,16 @@ class SessionController extends Controller
 
         $minutes = round($seconds / 60);
         if ($minutes < 60) {
-            return $minutes . ' ' . ($minutes == 1 ? 'minute' : 'minutes') . ' ago';
+            return $minutes.' '.($minutes == 1 ? 'minute' : 'minutes').' ago';
         }
 
         $hours = round($seconds / 3600);
         if ($hours < 24) {
-            return $hours . ' ' . ($hours == 1 ? 'hour' : 'hours') . ' ago';
+            return $hours.' '.($hours == 1 ? 'hour' : 'hours').' ago';
         }
 
         $days = round($seconds / 86400);
-        return $days . ' ' . ($days == 1 ? 'day' : 'days') . ' ago';
+
+        return $days.' '.($days == 1 ? 'day' : 'days').' ago';
     }
 }

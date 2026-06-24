@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,7 +13,8 @@ class NotificationController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            abort_unless(\App\Models\Setting::values()['module_notifications'] ?? true, 403, 'Notification module is disabled.');
+            abort_unless(Setting::values()['module_notifications'] ?? true, 403, 'Notification module is disabled.');
+
             return $next($request);
         });
     }

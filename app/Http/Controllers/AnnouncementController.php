@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAnnouncementRequest;
+use App\Http\Requests\UpdateAnnouncementRequest;
 use App\Models\Announcement;
 use App\Models\AuditLog;
+use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class AnnouncementController extends Controller
 {
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            abort_unless(\App\Models\Setting::values()['module_announcements'] ?? true, 403, 'Announcement module is disabled.');
+            abort_unless(Setting::values()['module_announcements'] ?? true, 403, 'Announcement module is disabled.');
+
             return $next($request);
         });
     }
@@ -19,18 +24,11 @@ class AnnouncementController extends Controller
     /**
      * Store a newly created announcement in storage.
      */
-    public function store(Request $request)
+    public function store(StoreAnnouncementRequest $request)
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-announcements');
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'style' => 'required|in:info,warning,danger,success',
-            'is_active' => 'required|boolean',
-            'starts_at' => 'nullable|date',
-            'ends_at' => 'nullable|date|after_or_equal:starts_at',
-        ]);
+        $validated = $request->validated();
 
         $validated['created_by'] = $request->user()->id;
 
@@ -39,7 +37,7 @@ class AnnouncementController extends Controller
         AuditLog::record(
             $request->user(),
             'announcement.created',
-            $announcement->id,
+            $announcement,
             "Created announcement: {$announcement->title}",
             [],
             $validated
@@ -51,18 +49,11 @@ class AnnouncementController extends Controller
     /**
      * Update the specified announcement in storage.
      */
-    public function update(Request $request, Announcement $announcement)
+    public function update(UpdateAnnouncementRequest $request, Announcement $announcement)
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-announcements');
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'style' => 'required|in:info,warning,danger,success',
-            'is_active' => 'required|boolean',
-            'starts_at' => 'nullable|date',
-            'ends_at' => 'nullable|date|after_or_equal:starts_at',
-        ]);
+        $validated = $request->validated();
 
         $oldData = $announcement->toArray();
         $announcement->update($validated);
@@ -70,7 +61,7 @@ class AnnouncementController extends Controller
         AuditLog::record(
             $request->user(),
             'announcement.updated',
-            $announcement->id,
+            $announcement,
             "Updated announcement: {$announcement->title}",
             $oldData,
             $validated
@@ -84,18 +75,18 @@ class AnnouncementController extends Controller
      */
     public function toggle(Request $request, Announcement $announcement)
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-announcements');
 
         $oldActive = $announcement->is_active;
-        $announcement->update(['is_active' => !$oldActive]);
+        $announcement->update(['is_active' => ! $oldActive]);
 
         AuditLog::record(
             $request->user(),
             'announcement.toggled',
-            $announcement->id,
+            $announcement,
             "Toggled announcement active state: {$announcement->title}",
             ['is_active' => $oldActive],
-            ['is_active' => !$oldActive]
+            ['is_active' => ! $oldActive]
         );
 
         return back()->with('success', 'Announcement status updated.');
@@ -106,7 +97,7 @@ class AnnouncementController extends Controller
      */
     public function destroy(Request $request, Announcement $announcement)
     {
-        abort_unless($request->user()->hasRole('superadmin'), 403);
+        Gate::authorize('manage-announcements');
 
         $oldData = $announcement->toArray();
         $title = $announcement->title;

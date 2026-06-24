@@ -10,6 +10,10 @@
         @php
             $systemSettings = \App\Models\Setting::values();
             $favicon = $systemSettings['app_favicon'] ?? null;
+            $availableFonts = ['inter', 'geist', 'roboto', 'poppins', 'montserrat', 'pt-sans', 'overpass-mono'];
+            $systemFont = in_array($systemSettings['system_font'] ?? 'inter', $availableFonts, true)
+                ? $systemSettings['system_font']
+                : 'inter';
         @endphp
         @if($favicon)
             <link rel="icon" href="{{ $favicon }}">
@@ -20,7 +24,7 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&family=Overpass+Mono:wght@400;500;700&family=PT+Sans:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700&family=Hedvig+Letters+Serif&family=Kumbh+Sans:wght@400;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Overpass+Mono:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=PT+Sans:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @routes
@@ -28,7 +32,7 @@
         @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
         @inertiaHead
     </head>
-    <body class="bg-background group/layout font-sans antialiased">
+    <body class="bg-background group/layout font-sans antialiased" data-theme-font="{{ $systemFont }}">
         @inertia
     </body>
 </html>

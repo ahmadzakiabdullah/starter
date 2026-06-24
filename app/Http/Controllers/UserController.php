@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use App\Models\AuditLog;
-use App\Notifications\AccountAccessChanged;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private readonly UserService $users,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -30,8 +30,8 @@ class UserController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -66,15 +66,8 @@ class UserController extends Controller
         }
 
         $users = $query->paginate(10)->withQueryString();
-        $roles = $this->assignableRolesFor($request->user());
-
-        // Calculate statistics
-        $stats = [
-            'total' => User::count(),
-            'admins' => User::whereHas('roles', fn ($q) => $q->whereIn('name', ['superadmin', 'admin']))->count(),
-            'verified' => User::whereNotNull('email_verified_at')->count(),
-            'unverified' => User::whereNull('email_verified_at')->count(),
-        ];
+        $roles = $this->users->assignableRolesFor($request->user());
+        $stats = $this->users->stats();
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
@@ -85,7 +78,7 @@ class UserController extends Controller
                 'role' => $request->input('role'),
                 'status' => $request->input('status'),
                 'sort' => $request->input('sort'),
-            ]
+            ],
         ]);
     }
 
@@ -96,60 +89,23 @@ class UserController extends Controller
     {
         Gate::authorize('manage-users');
 
-        $roles = $this->assignableRolesFor(request()->user());
+        $roles = $this->users->assignableRolesFor(request()->user());
 
         return Inertia::render('Admin/Users/CreateEdit', [
-            'roles' => $roles
+            'roles' => $roles,
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
         Gate::authorize('manage-users');
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|lowercase|alpha_dash|max:255|unique:users',
-            'email' => 'required|string|lowercase|email|max:255|unique:users',
-            'password' => ['required', Rules\Password::defaults()],
-            'roles' => 'required|array',
-            'roles.*' => 'string|exists:roles,name',
-            'avatar' => 'nullable|image|max:2048', // max 2MB
-            'email_verified' => 'required|boolean',
-        ]);
-
         $this->authorizeRoleAssignment(request()->user(), $request->input('roles'));
 
-        $avatarPath = null;
-        if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $avatarPath = Storage::url($path);
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'avatar' => $avatarPath,
-            'email_verified_at' => $request->boolean('email_verified') ? now() : null,
-        ]);
-
-        // Sync roles
-        $user->syncRoles($request->input('roles'));
-        $user->notify(new AccountAccessChanged('Your account has been created.'));
-
-        AuditLog::record(
-            request()->user(),
-            'user.created',
-            $user,
-            "Created user {$user->username}.",
-            [],
-            ['name' => $user->name, 'username' => $user->username, 'email' => $user->email, 'roles' => $user->getRoleNames()->all()],
-        );
+        $this->users->create($request->validated(), $request->user());
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -164,87 +120,26 @@ class UserController extends Controller
         $this->authorizeTargetUser(request()->user(), $user);
 
         $user->load('roles');
-        $roles = $this->assignableRolesFor(request()->user());
+        $roles = $this->users->assignableRolesFor(request()->user());
 
         return Inertia::render('Admin/Users/CreateEdit', [
             'user' => $user,
-            'roles' => $roles
+            'roles' => $roles,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
         Gate::authorize('manage-users');
 
         $this->authorizeTargetUser(request()->user(), $user);
 
-        // Inertia multipart/form-data doesn't support PUT directly, so we use POST method spoofing
-        // or validate input in POST request.
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => ['required', 'string', 'lowercase', 'alpha_dash', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => ['nullable', Rules\Password::defaults()],
-            'roles' => 'required|array',
-            'roles.*' => 'string|exists:roles,name',
-            'avatar' => 'nullable|image|max:2048',
-            'remove_avatar' => 'nullable|boolean',
-            'email_verified' => 'required|boolean',
-        ]);
-
         $this->authorizeRoleAssignment(request()->user(), $request->input('roles'));
 
-        $oldValues = [
-            'name' => $user->name,
-            'username' => $user->username,
-            'email' => $user->email,
-            'roles' => $user->getRoleNames()->all(),
-            'email_verified_at' => $user->email_verified_at,
-        ];
-
-        if ($request->boolean('remove_avatar') && $user->avatar) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $user->avatar));
-            $user->avatar = null;
-        }
-
-        if ($request->hasFile('avatar')) {
-            if ($user->avatar) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $user->avatar));
-            }
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = Storage::url($path);
-        }
-
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->email = $request->email;
-
-        // Prevent self-deverification to protect admin layout session
-        if ($request->has('email_verified') && $user->id !== auth()->id()) {
-            $user->email_verified_at = $request->boolean('email_verified') ? ($user->email_verified_at ?? now()) : null;
-        }
-
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-
-        $user->save();
-
-        // Sync roles
-        $user->syncRoles($request->input('roles'));
-        $user->notify(new AccountAccessChanged('Your account details or assigned roles were updated.'));
-
-        AuditLog::record(
-            request()->user(),
-            'user.updated',
-            $user,
-            "Updated user {$user->username}.",
-            $oldValues,
-            ['name' => $user->name, 'username' => $user->username, 'email' => $user->email, 'roles' => $user->getRoleNames()->all()],
-        );
+        $this->users->update($user, $request->validated(), $request->user());
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
@@ -262,19 +157,7 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'You cannot delete yourself.');
         }
 
-        if ($user->avatar) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $user->avatar));
-        }
-
-        AuditLog::record(
-            request()->user(),
-            'user.deleted',
-            $user,
-            "Deleted user {$user->username}.",
-            ['name' => $user->name, 'username' => $user->username, 'email' => $user->email, 'roles' => $user->getRoleNames()->all()],
-        );
-
-        $user->delete();
+        $this->users->delete($user, request()->user());
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
@@ -284,24 +167,7 @@ class UserController extends Controller
         Gate::authorize('manage-users');
         $this->authorizeTargetUser($request->user(), $user);
 
-        if ($user->email_verified_at) {
-            $user->email_verified_at = null;
-            $message = "User {$user->username} marked as unverified.";
-        } else {
-            $user->email_verified_at = now();
-            $message = "User {$user->username} successfully verified.";
-        }
-
-        $user->save();
-
-        AuditLog::record(
-            $request->user(),
-            'user.verification.toggled',
-            $user,
-            $message,
-            [],
-            ['email_verified_at' => $user->email_verified_at]
-        );
+        $message = $this->users->toggleVerification($user, $request->user());
 
         return back()->with('success', $message);
     }
@@ -328,39 +194,11 @@ class UserController extends Controller
             $this->authorizeTargetUser($actor, $target);
         }
 
-        $deletedCount = 0;
         foreach ($users as $user) {
-            if ($user->avatar) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $user->avatar));
-            }
-            
-            AuditLog::record(
-                $actor,
-                'user.deleted',
-                $user,
-                "Deleted user {$user->username} via bulk action.",
-                ['name' => $user->name, 'username' => $user->username, 'email' => $user->email, 'roles' => $user->getRoleNames()->all()],
-                []
-            );
-
-            $user->delete();
-            $deletedCount++;
+            $this->users->delete($user, $actor, true);
         }
 
-        return back()->with('success', "Successfully deleted {$deletedCount} users.");
-    }
-
-    /** @return \Illuminate\Support\Collection<int, Role> */
-    private function assignableRolesFor(User $actor): \Illuminate\Support\Collection
-    {
-        if ($actor->hasRole('superadmin')) {
-            return Role::query()->orderBy('name')->get();
-        }
-
-        return Role::query()
-            ->whereIn('name', $actor->hasRole('admin') ? ['manager', 'user'] : ['user'])
-            ->orderBy('name')
-            ->get();
+        return back()->with('success', "Successfully deleted {$users->count()} users.");
     }
 
     private function authorizeTargetUser(User $actor, User $target): void
@@ -371,7 +209,7 @@ class UserController extends Controller
 
         abort_if($actor->is($target), 403, 'You cannot change your own access level.');
 
-        $allowedRoles = $this->assignableRolesFor($actor)->pluck('name')->all();
+        $allowedRoles = $this->users->assignableRolesFor($actor)->pluck('name')->all();
         abort_if($target->getRoleNames()->diff($allowedRoles)->isNotEmpty(), 403, 'You cannot manage this user.');
     }
 
@@ -382,7 +220,7 @@ class UserController extends Controller
             return;
         }
 
-        $allowedRoles = $this->assignableRolesFor($actor)->pluck('name')->all();
+        $allowedRoles = $this->users->assignableRolesFor($actor)->pluck('name')->all();
         abort_if(array_diff($roles, $allowedRoles) !== [], 403, 'You cannot assign one or more selected roles.');
     }
 }

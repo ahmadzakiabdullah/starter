@@ -80,7 +80,7 @@ class UserManagementTest extends TestCase
         $response = $this->actingAs($superadmin)
             ->get(route('users.index', ['status' => 'verified']))
             ->assertStatus(200);
-            
+
         $usersData = $response->viewData('page')['props']['users']['data'];
         $this->assertTrue(collect($usersData)->contains('id', $userA->id));
         $this->assertFalse(collect($usersData)->contains('id', $userB->id));

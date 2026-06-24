@@ -19,7 +19,7 @@ class TwoFactorChallengeController extends Controller
      */
     public function create(Request $request): Response|RedirectResponse
     {
-        if (!$request->session()->has('login.id')) {
+        if (! $request->session()->has('login.id')) {
             return redirect()->route('login');
         }
 
@@ -31,7 +31,7 @@ class TwoFactorChallengeController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (!$request->session()->has('login.id')) {
+        if (! $request->session()->has('login.id')) {
             return redirect()->route('login');
         }
 
@@ -41,11 +41,11 @@ class TwoFactorChallengeController extends Controller
 
         $user = User::findOrFail($request->session()->get('login.id'));
 
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
 
         $isValid = $google2fa->verifyKey($user->two_factor_secret, $request->input('code'));
 
-        if (!$isValid) {
+        if (! $isValid) {
             throw ValidationException::withMessages([
                 'code' => 'The provided verification code is invalid.',
             ]);

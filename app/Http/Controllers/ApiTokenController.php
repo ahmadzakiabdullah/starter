@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class ApiTokenController extends Controller
@@ -9,7 +10,8 @@ class ApiTokenController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            abort_unless(\App\Models\Setting::values()['module_api_keys'] ?? true, 403, 'API Keys module is disabled.');
+            abort_unless(Setting::values()['module_api_keys'] ?? true, 403, 'API Keys module is disabled.');
+
             return $next($request);
         });
     }

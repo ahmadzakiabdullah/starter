@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use PragmaRX\Google2FA\Google2FA;
 
 class ProfileController extends Controller
 {
@@ -18,7 +21,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        $sessions = \Illuminate\Support\Facades\DB::table('sessions')
+        $sessions = DB::table('sessions')
             ->where('user_id', $request->user()->id)
             ->orderBy('last_activity', 'desc')
             ->get()
@@ -31,7 +34,7 @@ class ProfileController extends Controller
                     $browser = 'Chrome';
                 } elseif (preg_match('/Firefox/i', $ua)) {
                     $browser = 'Firefox';
-                } elseif (preg_match('/Safari/i', $ua) && !preg_match('/Chrome/i', $ua)) {
+                } elseif (preg_match('/Safari/i', $ua) && ! preg_match('/Chrome/i', $ua)) {
                     $browser = 'Safari';
                 } elseif (preg_match('/Edge/i', $ua)) {
                     $browser = 'Edge';
@@ -55,7 +58,7 @@ class ProfileController extends Controller
                     'browser' => $browser,
                     'platform' => $platform,
                     'is_current' => $session->id === $request->session()->getId(),
-                    'last_active' => \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
+                    'last_active' => Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
                 ];
             });
 
@@ -63,7 +66,7 @@ class ProfileController extends Controller
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
             'sessions' => $sessions,
-            'twoFactorEnabled' => !empty($request->user()->two_factor_secret),
+            'twoFactorEnabled' => ! empty($request->user()->two_factor_secret),
             'twoFactorSecret' => session('two_factor_secret'),
             'twoFactorQrCodeUrl' => session('two_factor_qr'),
         ]);
@@ -74,9 +77,9 @@ class ProfileController extends Controller
      */
     public function enableTwoFactor(Request $request): RedirectResponse
     {
-        $google2fa = new \PragmaRX\Google2FA\Google2FA();
+        $google2fa = new Google2FA;
         $secret = $google2fa->generateSecretKey();
-        
+
         $qrUrl = $google2fa->getQRCodeUrl(
             config('app.name'),
             $request->user()->email,
@@ -100,14 +103,14 @@ class ProfileController extends Controller
 
         $secret = $request->session()->get('two_factor_secret');
 
-        if (!$secret) {
+        if (! $secret) {
             return back()->withErrors(['code' => '2FA activation session expired. Please try again.']);
         }
 
-        $google2fa = new \PragmaRX\Google2FA\Google2FA();
+        $google2fa = new Google2FA;
         $isValid = $google2fa->verifyKey($secret, $request->input('code'));
 
-        if (!$isValid) {
+        if (! $isValid) {
             return back()->withErrors(['code' => 'The verification code is incorrect.']);
         }
 
@@ -145,7 +148,7 @@ class ProfileController extends Controller
             'password' => ['required', 'current_password'],
         ]);
 
-        \Illuminate\Support\Facades\DB::table('sessions')
+        DB::table('sessions')
             ->where('user_id', $request->user()->id)
             ->where('id', '!=', $request->session()->getId())
             ->delete();

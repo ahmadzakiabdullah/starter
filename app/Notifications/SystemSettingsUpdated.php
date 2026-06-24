@@ -3,15 +3,14 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class SystemSettingsUpdated extends Notification
+class SystemSettingsUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private readonly string $actorName)
-    {
-    }
+    public function __construct(private readonly string $actorName) {}
 
     public function via(object $notifiable): array
     {

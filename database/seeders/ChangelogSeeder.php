@@ -199,5 +199,19 @@ class ChangelogSeeder extends Seeder
                 ['type' => 'Fixed', 'content' => 'Prevention of self-deverification account lockouts.'],
             ],
         ]);
+
+        Changelog::create([
+            'version' => 'v2.3.0',
+            'title' => 'System Font Customization',
+            'description' => 'Added administrator-controlled typography settings so the portal font can be selected centrally and applied consistently across the application.',
+            'release_date' => '2026-06-24',
+            'is_published' => true,
+            'changes' => [
+                ['type' => 'Added', 'content' => 'System Font selector in Dashboard Settings with Inter, Geist, Roboto, Poppins, Montserrat, PT Sans, and Overpass Mono options.'],
+                ['type' => 'Added', 'content' => 'Persistent global font preference applied to all portal pages for every user.'],
+                ['type' => 'Improved', 'content' => 'Live typography preview when choosing a font in the Settings panel.'],
+                ['type' => 'Fixed', 'content' => 'Applied font switching without accessing Inertia page context outside the Inertia component tree.'],
+            ],
+        ]);
     }
 }

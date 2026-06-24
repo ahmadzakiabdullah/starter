@@ -1,19 +1,22 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SystemSettingsController;
 use App\Http\Controllers\AnnouncementController;
-use App\Http\Controllers\BackupController;
-use App\Http\Controllers\LogReaderController;
-use App\Http\Controllers\HealthMonitorController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\MediaController;
-use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ApiTokenController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\ChangelogController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HealthMonitorController;
+use App\Http\Controllers\LogReaderController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SystemSettingsController;
+use App\Http\Controllers\UserController;
+use App\Models\Setting;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,7 +24,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register') && (\App\Models\Setting::values()['enable_registration'] ?? true),
+        'canRegister' => Route::has('register') && (Setting::values()['enable_registration'] ?? true),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -29,8 +32,8 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'create'])->name('two-factor.login');
-Route::post('two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'store']);
+Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])->name('two-factor.login');
+Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -73,10 +76,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('dashboard/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     // Changelogs / Versioning Timeline
-    Route::get('dashboard/changelogs', [\App\Http\Controllers\ChangelogController::class, 'index'])->name('changelogs.index');
-    Route::post('dashboard/changelogs', [\App\Http\Controllers\ChangelogController::class, 'store'])->name('changelogs.store');
-    Route::put('dashboard/changelogs/{changelog}', [\App\Http\Controllers\ChangelogController::class, 'update'])->name('changelogs.update');
-    Route::delete('dashboard/changelogs/{changelog}', [\App\Http\Controllers\ChangelogController::class, 'destroy'])->name('changelogs.destroy');
+    Route::get('dashboard/changelogs', [ChangelogController::class, 'index'])->name('changelogs.index');
+    Route::post('dashboard/changelogs', [ChangelogController::class, 'store'])->name('changelogs.store');
+    Route::put('dashboard/changelogs/{changelog}', [ChangelogController::class, 'update'])->name('changelogs.update');
+    Route::delete('dashboard/changelogs/{changelog}', [ChangelogController::class, 'destroy'])->name('changelogs.destroy');
 
     // System Diagnostics & Admin Expansion Modules
     Route::get('dashboard/backups', [BackupController::class, 'index'])->name('backups.index');

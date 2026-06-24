@@ -16,7 +16,7 @@ class Announcement extends Model
         'is_active',
         'starts_at',
         'ends_at',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [
@@ -39,14 +39,15 @@ class Announcement extends Model
     public static function active()
     {
         $now = now();
+
         return self::where('is_active', true)
             ->where(function ($query) use ($now) {
                 $query->whereNull('starts_at')
-                      ->orWhere('starts_at', '<=', $now);
+                    ->orWhere('starts_at', '<=', $now);
             })
             ->where(function ($query) use ($now) {
                 $query->whereNull('ends_at')
-                      ->orWhere('ends_at', '>=', $now);
+                    ->orWhere('ends_at', '>=', $now);
             })
             ->latest()
             ->first();
