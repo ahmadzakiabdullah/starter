@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UploadMediaRequest;
+use App\Http\Resources\MediaResource;
 use App\Models\AuditLog;
 use App\Models\Media;
 use App\Services\MediaService;
@@ -27,17 +28,14 @@ class MediaController extends Controller
     {
         $query = Media::query()->latest();
 
-        // Search name
         if ($request->filled('search')) {
             $query->where('name', 'like', '%'.$request->search.'%');
         }
 
-        // Folder penapisan
         if ($request->filled('folder')) {
             $query->where('folder', $request->folder);
         }
 
-        // Type filter (e.g. image, document)
         if ($request->filled('type')) {
             $type = $request->type;
             if ($type === 'image') {
@@ -47,17 +45,13 @@ class MediaController extends Controller
             }
         }
 
-        // Dynamic folders list
-        $folders = Media::whereNotNull('folder')
-            ->where('folder', '!=', '')
-            ->distinct()
-            ->pluck('folder');
+        $folders = $this->media->folders();
 
         $files = $query->paginate(24)->withQueryString();
 
         if ($request->wantsJson() && ! $request->header('X-Inertia')) {
             return response()->json([
-                'files' => $files->items(),
+                'files' => MediaResource::collection($files->items()),
                 'pagination' => [
                     'current_page' => $files->currentPage(),
                     'last_page' => $files->lastPage(),
@@ -146,5 +140,52 @@ class MediaController extends Controller
         );
 
         return back()->with('success', 'Selected files deleted successfully.');
+    }
+
+    public function listFolders(Request $request): array
+    {
+        return [
+            'folders' => $this->media->folders(),
+        ];
+    }
+
+    public function createFolder(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:50|unique:media_folders,name',
+        ]);
+
+        $this->media->createFolder($request->name);
+
+        AuditLog::record(
+            $request->user(),
+            'media.folder_created',
+            null,
+            "Created media folder: '{$request->name}'.",
+            [],
+            ['folder' => $request->name]
+        );
+
+        return back()->with('success', "Folder '{$request->name}' created successfully.");
+    }
+
+    public function deleteFolder(string $folder): RedirectResponse
+    {
+        $found = $this->media->deleteFolder($folder);
+
+        if (! $found) {
+            return back()->with('error', "Folder '{$folder}' not found.");
+        }
+
+        AuditLog::record(
+            request()->user(),
+            'media.folder_deleted',
+            null,
+            "Deleted media folder: '{$folder}'.",
+            [],
+            ['folder' => $folder]
+        );
+
+        return back()->with('success', "Folder '{$folder}' deleted successfully.");
     }
 }

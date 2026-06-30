@@ -4,6 +4,35 @@ All notable changes to this Laravel + Inertia (React + TypeScript) project will 
 
 ---
 
+## [2.4.0] - 2026-06-29
+
+### Added
+- **Media Folder Management**: Introduced a `media_folders` database table, model, and dedicated CRUD endpoints (`POST`/`DELETE` `/dashboard/media/folders`). Admins can now create and delete virtual folders directly without requiring a file upload.
+- **Folder Persistence**: Merged manually created folders (from `media_folders` table) with auto-discovered folders (from media records) in a single unified folder list.
+
+### Changed
+- **Media Manager Frontend Refactored**: The 644-line `Index.tsx` page was decomposed into 10 focused sub-components under `Partials/`:
+  - `MediaFolderList`, `MediaSearchBar`, `MediaUploadDropzone`, `MediaFileCard`, `MediaGrid`, `MediaPreviewPanel`, `MediaPagination`, `RenameDialog`, `ConfirmDeleteDialog`, `CreateFolderDialog`.
+- **Extracted State Management**: All page state and Inertia router actions were extracted into a custom `useMediaManager` hook for cleaner separation of concerns.
+- **Shared Types**: Inline TypeScript interfaces extracted to a dedicated `types.ts` file.
+- **MediaController now uses MediaResource** for JSON API responses.
+
+### Fixed
+- **Native `confirm()` Replaced**: Browser `confirm()` dialogs for delete and bulk-delete actions replaced with proper Radix `AlertDialog` components, providing a consistent and theme-compliant UX.
+- **Folder Creation**: The "New Folder" dialog now persists folders to the database via a backend endpoint instead of only setting an active filter.
+
+## [2.3.0] - 2026-06-24
+
+### Added
+- **System Font Customization**: Administrator-controlled typography settings so the portal font can be selected centrally and applied consistently across the application.
+- **Persistent global font preference**: Applied to all portal pages for every user.
+
+### Improved
+- **Live typography preview**: When choosing a font in the Settings panel.
+
+### Fixed
+- **Font switching**: Applied without accessing Inertia page context outside the Inertia component tree.
+
 ## [2.2.0] - 2026-06-21
 
 ### Added

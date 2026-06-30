@@ -97,6 +97,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('dashboard/media/{media}/rename', [MediaController::class, 'rename'])->name('media.rename');
     Route::delete('dashboard/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
     Route::post('dashboard/media/bulk-destroy', [MediaController::class, 'bulkDestroy'])->name('media.bulk-destroy');
+    Route::get('dashboard/media/folders', [MediaController::class, 'listFolders'])->name('media.folders');
+    Route::post('dashboard/media/folders', [MediaController::class, 'createFolder'])->name('media.folders.create');
+    Route::delete('dashboard/media/folders/{folder}', [MediaController::class, 'deleteFolder'])->name('media.folders.destroy');
 
     Route::get('dashboard/health', [HealthMonitorController::class, 'index'])->name('health.index');
 });

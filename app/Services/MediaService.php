@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Media;
+use App\Models\MediaFolder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -55,5 +56,36 @@ class MediaService
         }
 
         return $mediaItems->count();
+    }
+
+    /** @return array<int, string> */
+    public function folders(): array
+    {
+        $dbFolders = Media::whereNotNull('folder')
+            ->where('folder', '!=', '')
+            ->distinct()
+            ->orderBy('folder')
+            ->pluck('folder')
+            ->toArray();
+
+        $createdFolders = MediaFolder::orderBy('name')
+            ->pluck('name')
+            ->toArray();
+
+        return array_values(array_unique([...$createdFolders, ...$dbFolders]));
+    }
+
+    public function createFolder(string $name): MediaFolder
+    {
+        return MediaFolder::firstOrCreate(['name' => trim($name)]);
+    }
+
+    public function deleteFolder(string $name): bool
+    {
+        $deleted = MediaFolder::where('name', $name)->delete();
+
+        Media::where('folder', $name)->update(['folder' => null]);
+
+        return $deleted > 0;
     }
 }
