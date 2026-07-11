@@ -1,0 +1,241 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Variable \$changes in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: app/Console/Commands/SyncChangelogFromGit.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AuditLogController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$username\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AuditLogController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Pagination\\AbstractPaginator\<int,App\\Models\\AuditLog\>\:\:through\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Http/Controllers/AuditLogController.php
+
+		-
+			message: '#^Parameter \#1 \$user of class Illuminate\\Auth\\Events\\Verified constructor expects Illuminate\\Contracts\\Auth\\MustVerifyEmail, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/VerifyEmailController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\AuditLog\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Illuminate\\Foundation\\Application and ''eventsAreCached'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Http/Controllers/HealthMonitorController.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between array\|string\|false and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Http/Controllers/LogReaderController.php
+
+		-
+			message: '#^Parameter \#3 \$subject of static method App\\Models\\AuditLog\:\:record\(\) expects Illuminate\\Database\\Eloquent\\Model\|null, Spatie\\Permission\\Contracts\\Role given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/RoleController.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$event\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$new_values\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$old_values\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$file_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$folder\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$formatted_size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$mime_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/MediaResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$username\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\UserResource\:\:getRoleNames\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, Illuminate\\Routing\\RouteCollectionInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Mcp/Tools/ApplicationStatus.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Illuminate\\Http\\Request\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Models/AuditLog.php
+
+		-
+			message: '#^Unsafe access to private property App\\Models\\Setting\:\:\$cacheKey through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 2
+			path: app/Models/Setting.php
+
+		-
+			message: '#^Unsafe access to private property App\\Models\\Setting\:\:\$encrypted through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 2
+			path: app/Models/Setting.php
+
+		-
+			message: '#^Unsafe call to private method App\\Models\\Setting\:\:decryptValue\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: app/Models/Setting.php
+
+		-
+			message: '#^Parameter \#1 \$actor of static method App\\Models\\AuditLog\:\:record\(\) expects App\\Models\\User\|null, Illuminate\\Contracts\\Auth\\Authenticatable given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Parameter \#3 \$subject of static method App\\Models\\AuditLog\:\:record\(\) expects Illuminate\\Database\\Eloquent\\Model\|null, Illuminate\\Contracts\\Auth\\Authenticatable given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/AppServiceProvider.php
