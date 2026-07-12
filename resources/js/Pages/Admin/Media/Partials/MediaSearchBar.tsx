@@ -1,6 +1,6 @@
-import { Search } from 'lucide-react';
-import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Search } from 'lucide-react';
 
 interface MediaSearchBarProps {
     search: string;
@@ -10,20 +10,26 @@ interface MediaSearchBarProps {
     onTypeFilter: (type: string | null) => void;
 }
 
-export default function MediaSearchBar({ search, activeType, onSearchChange, onSearch, onTypeFilter }: MediaSearchBarProps) {
+export default function MediaSearchBar({
+    search,
+    activeType,
+    onSearchChange,
+    onSearch,
+    onTypeFilter,
+}: MediaSearchBarProps) {
     return (
-        <div className="flex flex-col sm:flex-row items-center gap-4 bg-card border p-3 rounded-2xl shadow-sm">
-            <div className="relative flex-1 w-full">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="bg-card flex flex-col items-center gap-4 rounded-2xl border p-3 shadow-sm sm:flex-row">
+            <div className="relative w-full flex-1">
+                <Search className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                 <Input
                     placeholder="Search files..."
                     value={search}
                     onChange={(e) => onSearchChange(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-                    className="pl-9 w-full"
+                    className="w-full pl-9"
                 />
             </div>
-            <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto shrink-0 pb-1 sm:pb-0">
+            <div className="flex w-full shrink-0 items-center gap-1.5 overflow-x-auto pb-1 sm:w-auto sm:pb-0">
                 <Button
                     variant={activeType === null ? 'default' : 'outline'}
                     size="sm"

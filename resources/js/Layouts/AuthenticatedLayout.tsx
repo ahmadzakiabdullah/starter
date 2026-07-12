@@ -1,25 +1,24 @@
-import React, { PropsWithChildren } from "react";
-import { SidebarInset, SidebarProvider } from "@/Components/ui/sidebar";
-import { AppSidebar } from "@/Components/layout/sidebar/app-sidebar";
-import { SiteHeader } from "@/Components/layout/header";
-import AnnouncementBanner from "@/Components/layout/AnnouncementBanner";
+import AnnouncementBanner from '@/Components/layout/AnnouncementBanner';
+import { SiteHeader } from '@/Components/layout/header';
+import { AppSidebar } from '@/Components/layout/sidebar/app-sidebar';
+import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
+import React, { PropsWithChildren } from 'react';
 
-export default function AuthenticatedLayout({
-    children,
-}: PropsWithChildren) {
+export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     return (
         <SidebarProvider
             defaultOpen={true}
             style={
                 {
-                    "--sidebar-width": "calc(var(--spacing) * 64)",
-                    "--header-height": "calc(var(--spacing) * 14)",
-                    "--content-padding": "calc(var(--spacing) * 4)",
-                    "--content-margin": "calc(var(--spacing) * 1.5)",
-                    "--content-full-height":
-                        "calc(100vh - var(--header-height) - (var(--content-padding) * 2) - (var(--content-margin) * 2))"
+                    '--sidebar-width': 'calc(var(--spacing) * 64)',
+                    '--header-height': 'calc(var(--spacing) * 14)',
+                    '--content-padding': 'calc(var(--spacing) * 4)',
+                    '--content-margin': 'calc(var(--spacing) * 1.5)',
+                    '--content-full-height':
+                        'calc(100vh - var(--header-height) - (var(--content-padding) * 2) - (var(--content-margin) * 2))',
                 } as React.CSSProperties
-            }>
+            }
+        >
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <AnnouncementBanner />

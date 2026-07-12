@@ -1,11 +1,11 @@
 import InputError from '@/Components/InputError';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
-import React, { FormEventHandler } from 'react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import GuestLayout from '@/Layouts/GuestLayout';
+import { Head, useForm } from '@inertiajs/react';
 import { KeyRound, ShieldCheck } from 'lucide-react';
+import { FormEventHandler } from 'react';
 
 export default function TwoFactorChallenge() {
     const { data, setData, post, processing, errors } = useForm({
@@ -21,21 +21,24 @@ export default function TwoFactorChallenge() {
         <GuestLayout>
             <Head title="Two-Factor Verification" />
 
-            <div className="space-y-2 mb-6 text-center">
-                <div className="mx-auto inline-flex items-center justify-center p-3 rounded-full bg-primary/10 text-primary border border-primary/20">
+            <div className="mb-6 space-y-2 text-center">
+                <div className="bg-primary/10 text-primary border-primary/20 mx-auto inline-flex items-center justify-center rounded-full border p-3">
                     <ShieldCheck className="h-6 w-6" />
                 </div>
-                <h1 className="text-xl font-bold tracking-tight text-foreground">
+                <h1 className="text-foreground text-xl font-bold tracking-tight">
                     Two-Factor Authentication
                 </h1>
-                <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                    Please open your authenticator app and enter the 6-digit verification code to complete sign-in.
+                <p className="text-muted-foreground mx-auto max-w-xs text-xs">
+                    Please open your authenticator app and enter the 6-digit
+                    verification code to complete sign-in.
                 </p>
             </div>
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-1">
-                    <Label htmlFor="code" className="text-xs font-semibold">Verification Code</Label>
+                    <Label htmlFor="code" className="text-xs font-semibold">
+                        Verification Code
+                    </Label>
                     <div className="relative">
                         <Input
                             id="code"
@@ -44,18 +47,30 @@ export default function TwoFactorChallenge() {
                             placeholder="e.g. 123456"
                             value={data.code}
                             maxLength={6}
-                            className="pl-9 font-mono tracking-[0.25em] text-center text-base h-11"
-                            onChange={(e) => setData('code', e.target.value.replace(/\D/g, ''))}
+                            className="h-11 pl-9 text-center font-mono text-base tracking-[0.25em]"
+                            onChange={(e) =>
+                                setData(
+                                    'code',
+                                    e.target.value.replace(/\D/g, ''),
+                                )
+                            }
                             required
                             autoFocus
                             autoComplete="one-time-code"
                         />
-                        <KeyRound className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                        <KeyRound className="text-muted-foreground absolute top-3.5 left-3 h-4 w-4" />
                     </div>
-                    <InputError message={errors.code} className="mt-1 text-[10px]" />
+                    <InputError
+                        message={errors.code}
+                        className="mt-1 text-[10px]"
+                    />
                 </div>
 
-                <Button className="w-full text-xs font-semibold h-10" disabled={processing} type="submit">
+                <Button
+                    className="h-10 w-full text-xs font-semibold"
+                    disabled={processing}
+                    type="submit"
+                >
                     {processing ? 'Verifying...' : 'Verify & Continue'}
                 </Button>
             </form>

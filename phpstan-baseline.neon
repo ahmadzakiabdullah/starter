@@ -61,42 +61,6 @@ parameters:
 			path: app/Http/Controllers/RoleController.php
 
 		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$created_at\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/AuditLogResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/AuditLogResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$event\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/AuditLogResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/AuditLogResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$new_values\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/AuditLogResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\AuditLogResource\:\:\$old_values\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/AuditLogResource.php
-
-		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\MediaResource\:\:\$created_at\.$#'
 			identifier: property.notFound
 			count: 1

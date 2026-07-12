@@ -6,24 +6,27 @@ export default function Guest({ children }: PropsWithChildren) {
     const { system } = usePage().props as any;
 
     return (
-        <div className="relative flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4 dark:bg-slate-950 transition-colors duration-300 overflow-hidden">
+        <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-50 p-4 transition-colors duration-300 dark:bg-slate-950">
             {/* Backdrop glowing blobs */}
-            <div className="absolute -top-[20%] -left-[10%] w-[450px] h-[450px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute -bottom-[20%] -right-[10%] w-[450px] h-[450px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="bg-primary/10 pointer-events-none absolute -top-[20%] -left-[10%] h-[450px] w-[450px] rounded-full blur-[100px]" />
+            <div className="pointer-events-none absolute -right-[10%] -bottom-[20%] h-[450px] w-[450px] rounded-full bg-indigo-500/10 blur-[100px]" />
 
-            <div className="w-full max-w-md relative z-10 space-y-6">
+            <div className="relative z-10 w-full max-w-md space-y-6">
                 {/* Brand Logo & Name */}
-                <div className="flex flex-col items-center text-center space-y-2 select-none">
-                    <Link href="/" className="inline-flex items-center justify-center p-3 rounded-2xl bg-primary/10 border border-primary/20 hover:scale-105 transition-transform">
+                <div className="flex flex-col items-center space-y-2 text-center select-none">
+                    <Link
+                        href="/"
+                        className="bg-primary/10 border-primary/20 inline-flex items-center justify-center rounded-2xl border p-3 transition-transform hover:scale-105"
+                    >
                         <Logo />
                     </Link>
                     <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-                        {system?.app_name ?? "Laravel"}
+                        {system?.app_name ?? 'Laravel'}
                     </h2>
                 </div>
 
                 {/* Main Glass Card */}
-                <div className="w-full overflow-hidden bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/40 p-6 sm:p-8 rounded-2xl shadow-xl">
+                <div className="w-full overflow-hidden rounded-2xl border border-slate-200/50 bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8 dark:border-slate-800/40 dark:bg-slate-900/60">
                     {children}
                 </div>
             </div>

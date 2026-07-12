@@ -44,7 +44,12 @@ class AuditLogController extends Controller
             $query->whereDate('created_at', '<=', $request->input('date_to'));
         }
 
-        $logs = $query->latest()->paginate(25)->withQueryString()->through(fn (AuditLog $log): array => [
+        $perPage = (int) $request->input('per_page', 25);
+        if (! in_array($perPage, [25, 50, 100], true)) {
+            $perPage = 25;
+        }
+
+        $logs = $query->latest()->paginate($perPage)->withQueryString()->through(fn (AuditLog $log): array => [
             'id' => $log->id,
             'event' => $log->event,
             'description' => $log->description,
@@ -71,6 +76,7 @@ class AuditLogController extends Controller
                 'event' => $request->input('event'),
                 'date_from' => $request->input('date_from'),
                 'date_to' => $request->input('date_to'),
+                'per_page' => $request->input('per_page', '25'),
             ],
         ]);
     }

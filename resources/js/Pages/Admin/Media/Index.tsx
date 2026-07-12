@@ -1,31 +1,57 @@
+import { Button } from '@/Components/ui/button';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { Images, FolderPlus, Trash2 } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
-import { useMediaManager } from './useMediaManager';
-import MediaFolderList from './Partials/MediaFolderList';
-import MediaSearchBar from './Partials/MediaSearchBar';
-import MediaUploadDropzone from './Partials/MediaUploadDropzone';
-import MediaGrid from './Partials/MediaGrid';
-import MediaPreviewPanel from './Partials/MediaPreviewPanel';
-import MediaPagination from './Partials/MediaPagination';
-import RenameDialog from './Partials/RenameDialog';
+import { FolderPlus, Images, Trash2 } from 'lucide-react';
 import ConfirmDeleteDialog from './Partials/ConfirmDeleteDialog';
 import CreateFolderDialog from './Partials/CreateFolderDialog';
+import MediaFolderList from './Partials/MediaFolderList';
+import MediaGrid from './Partials/MediaGrid';
+import MediaPagination from './Partials/MediaPagination';
+import MediaPreviewPanel from './Partials/MediaPreviewPanel';
+import MediaSearchBar from './Partials/MediaSearchBar';
+import MediaUploadDropzone from './Partials/MediaUploadDropzone';
+import RenameDialog from './Partials/RenameDialog';
 import type { IndexProps } from './types';
+import { useMediaManager } from './useMediaManager';
 
 export default function Index({ files, folders, filters }: IndexProps) {
     const {
-        search, setSearch, activeFolder, activeType, selectedFile, setSelectedFile,
-        selectedIds, dragActive,
-        renameTarget, renameValue, setRenameValue,
-        deleteTarget, bulkDeleteConfirm, createFolderOpen, setCreateFolderOpen,
-        handleSearch, handleFolderFilter, handleTypeFilter, changePage,
-        handleFileChange, handleDragEnter, handleDragLeave, handleDragOver, handleDrop,
-        copyLink, triggerRename, submitRename,
-        requestDelete, confirmDelete, cancelDelete,
-        requestBulkDelete, confirmBulkDelete, cancelBulkDelete,
-        toggleSelectFile, submitCreateFolder, setRenameTarget,
+        search,
+        setSearch,
+        activeFolder,
+        activeType,
+        selectedFile,
+        setSelectedFile,
+        selectedIds,
+        dragActive,
+        renameTarget,
+        renameValue,
+        setRenameValue,
+        deleteTarget,
+        bulkDeleteConfirm,
+        createFolderOpen,
+        setCreateFolderOpen,
+        handleSearch,
+        handleFolderFilter,
+        handleTypeFilter,
+        changePage,
+        handleFileChange,
+        handleDragEnter,
+        handleDragLeave,
+        handleDragOver,
+        handleDrop,
+        copyLink,
+        triggerRename,
+        submitRename,
+        requestDelete,
+        confirmDelete,
+        cancelDelete,
+        requestBulkDelete,
+        confirmBulkDelete,
+        cancelBulkDelete,
+        toggleSelectFile,
+        submitCreateFolder,
+        setRenameTarget,
     } = useMediaManager({ initialFilters: filters, folders });
 
     return (
@@ -33,14 +59,15 @@ export default function Index({ files, folders, filters }: IndexProps) {
             <Head title="Media Manager" />
 
             <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                            <Images className="h-6 w-6 text-primary" />
+                        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                            <Images className="text-primary h-6 w-6" />
                             Media Library
                         </h1>
-                        <p className="text-sm text-muted-foreground">
-                            Upload and manage visual assets, files, and metadata folders.
+                        <p className="text-muted-foreground text-sm">
+                            Upload and manage visual assets, files, and metadata
+                            folders.
                         </p>
                     </div>
 
@@ -68,7 +95,7 @@ export default function Index({ files, folders, filters }: IndexProps) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
                     <div className="space-y-4 lg:col-span-1">
                         <MediaFolderList
                             folders={folders}
@@ -77,7 +104,9 @@ export default function Index({ files, folders, filters }: IndexProps) {
                         />
                     </div>
 
-                    <div className={`${selectedFile ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-6 transition-all duration-300`}>
+                    <div
+                        className={`${selectedFile ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-6 transition-all duration-300`}
+                    >
                         <MediaSearchBar
                             search={search}
                             activeType={activeType}

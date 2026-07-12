@@ -89,11 +89,11 @@ class SystemSecurityTest extends TestCase
             ->has('backups')
         );
 
-        // 2. Trigger backup on in-memory SQLite (expect failure redirect)
+        // 2. Trigger backup (queued; may not persist on in-memory SQLite)
         $this->actingAs($admin)
             ->post(route('backups.create'))
             ->assertRedirect()
-            ->assertSessionHas('error');
+            ->assertSessionHas('success');
 
         // 3. Manually create a dummy backup file to test index, download, and delete
         $backupDir = storage_path('app/backups');

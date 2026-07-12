@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AuditLog;
+use App\Jobs\CreateBackupJob;
 use App\Services\BackupService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,28 +30,15 @@ class BackupController extends Controller
     }
 
     /**
-     * Trigger a database backup.
+     * Trigger a database backup via queued job.
      */
     public function create(Request $request): RedirectResponse
     {
         Gate::authorize('manage-system');
 
-        try {
-            $filename = $this->backups->create();
+        CreateBackupJob::dispatch($request->user());
 
-            AuditLog::record(
-                $request->user(),
-                'backup.created',
-                null,
-                "Created database backup archive: {$filename}",
-                [],
-                ['filename' => $filename]
-            );
-
-            return back()->with('success', "Database backup created successfully: {$filename}");
-        } catch (\Exception $e) {
-            return back()->with('error', 'Backup failed: '.$e->getMessage());
-        }
+        return back()->with('success', 'Database backup has been queued for creation.');
     }
 
     /**
@@ -80,15 +67,6 @@ class BackupController extends Controller
         if (! $this->backups->delete($filename)) {
             return back()->with('error', 'File not found or invalid filename.');
         }
-
-        AuditLog::record(
-            $request->user(),
-            'backup.deleted',
-            null,
-            "Deleted database backup archive: {$filename}",
-            ['filename' => $filename],
-            []
-        );
 
         return back()->with('success', 'Backup file deleted successfully.');
     }

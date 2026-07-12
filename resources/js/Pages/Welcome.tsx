@@ -1,6 +1,6 @@
+import AnnouncementBanner from '@/Components/layout/AnnouncementBanner';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import AnnouncementBanner from '@/Components/layout/AnnouncementBanner';
 
 export default function Welcome({
     auth,
@@ -25,7 +25,7 @@ export default function Welcome({
                 <AnnouncementBanner />
                 <img
                     id="background"
-                    className="absolute -left-20 top-0 max-w-[877px]"
+                    className="absolute top-0 -left-20 max-w-[877px]"
                     src="https://laravel.com/assets/img/welcome/background.svg"
                 />
                 <div className="relative flex min-h-screen flex-col items-center justify-center selection:bg-[#FF2D20] selection:text-white">

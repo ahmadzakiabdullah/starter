@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
 import { router } from '@inertiajs/react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import type { MediaFile, MediaFilters } from './types';
 
@@ -8,10 +8,17 @@ interface UseMediaManagerProps {
     folders: string[];
 }
 
-export function useMediaManager({ initialFilters, folders: _folders }: UseMediaManagerProps) {
+export function useMediaManager({
+    initialFilters,
+    folders: _folders,
+}: UseMediaManagerProps) {
     const [search, setSearch] = useState(initialFilters.search || '');
-    const [activeFolder, setActiveFolder] = useState<string | null>(initialFilters.folder || null);
-    const [activeType, setActiveType] = useState<string | null>(initialFilters.type || null);
+    const [activeFolder, setActiveFolder] = useState<string | null>(
+        initialFilters.folder || null,
+    );
+    const [activeType, setActiveType] = useState<string | null>(
+        initialFilters.type || null,
+    );
 
     const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -27,10 +34,21 @@ export function useMediaManager({ initialFilters, folders: _folders }: UseMediaM
     const [createFolderOpen, setCreateFolderOpen] = useState(false);
 
     const buildParams = useCallback(
-        (overrides?: Partial<{ search: string; folder: string | null; type: string | null; page: number }>) => {
+        (
+            overrides?: Partial<{
+                search: string;
+                folder: string | null;
+                type: string | null;
+                page: number;
+            }>,
+        ) => {
             const s = overrides?.search ?? search;
-            const f = overrides?.folder !== undefined ? overrides.folder : activeFolder;
-            const t = overrides?.type !== undefined ? overrides.type : activeType;
+            const f =
+                overrides?.folder !== undefined
+                    ? overrides.folder
+                    : activeFolder;
+            const t =
+                overrides?.type !== undefined ? overrides.type : activeType;
             return {
                 search: s || undefined,
                 folder: f || undefined,
@@ -78,11 +96,15 @@ export function useMediaManager({ initialFilters, folders: _folders }: UseMediaM
 
     const executeUpload = useCallback(
         (file: File, folderTarget?: string) => {
-            const formData = { file, folder: folderTarget || activeFolder || '' };
+            const formData = {
+                file,
+                folder: folderTarget || activeFolder || '',
+            };
             router.post(route('media.upload'), formData, {
                 forceFormData: true,
                 onSuccess: () => toast.success('Asset uploaded successfully.'),
-                onError: (errors) => toast.error(errors.file || 'Failed to upload asset.'),
+                onError: (errors) =>
+                    toast.error(errors.file || 'Failed to upload asset.'),
             });
         },
         [activeFolder],
@@ -144,7 +166,9 @@ export function useMediaManager({ initialFilters, folders: _folders }: UseMediaM
                     toast.success('Asset renamed successfully.');
                     setRenameTarget(null);
                     if (selectedFile?.id === renameTarget.id) {
-                        setSelectedFile((prev) => (prev ? { ...prev, name: renameValue } : null));
+                        setSelectedFile((prev) =>
+                            prev ? { ...prev, name: renameValue } : null,
+                        );
                     }
                 },
             },
@@ -194,27 +218,28 @@ export function useMediaManager({ initialFilters, folders: _folders }: UseMediaM
     }, []);
 
     const toggleSelectFile = useCallback((id: number) => {
-        setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+        setSelectedIds((prev) =>
+            prev.includes(id)
+                ? prev.filter((item) => item !== id)
+                : [...prev, id],
+        );
     }, []);
 
-    const submitCreateFolder = useCallback(
-        (name: string) => {
-            router.post(
-                route('media.folders.create'),
-                { name },
-                {
-                    onSuccess: () => {
-                        toast.success(`Folder '${name}' created.`);
-                        setCreateFolderOpen(false);
-                    },
-                    onError: (errors) => {
-                        toast.error(errors.name || 'Failed to create folder.');
-                    },
+    const submitCreateFolder = useCallback((name: string) => {
+        router.post(
+            route('media.folders.create'),
+            { name },
+            {
+                onSuccess: () => {
+                    toast.success(`Folder '${name}' created.`);
+                    setCreateFolderOpen(false);
                 },
-            );
-        },
-        [],
-    );
+                onError: (errors) => {
+                    toast.error(errors.name || 'Failed to create folder.');
+                },
+            },
+        );
+    }, []);
 
     return {
         search,

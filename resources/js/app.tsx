@@ -1,12 +1,12 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { createRoot } from 'react-dom/client';
-import { ThemeProvider } from 'next-themes';
 import { ActiveThemeProvider } from '@/Components/active-theme';
 import { Toaster } from '@/Components/ui/sonner';
+import { createInertiaApp } from '@inertiajs/react';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { ThemeProvider } from 'next-themes';
+import { createRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -31,7 +31,7 @@ createInertiaApp({
                     <App {...props} />
                     <Toaster position="top-center" richColors />
                 </ActiveThemeProvider>
-            </ThemeProvider>
+            </ThemeProvider>,
         );
     },
     progress: {

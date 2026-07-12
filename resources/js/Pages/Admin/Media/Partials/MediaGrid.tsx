@@ -1,6 +1,6 @@
 import { FolderOpen } from 'lucide-react';
-import MediaFileCard from './MediaFileCard';
 import type { MediaFile } from '../types';
+import MediaFileCard from './MediaFileCard';
 
 interface MediaGridProps {
     files: MediaFile[];
@@ -25,16 +25,18 @@ export default function MediaGrid({
 }: MediaGridProps) {
     if (files.length === 0) {
         return (
-            <div className="text-center py-12 bg-card border rounded-2xl shadow-sm text-muted-foreground">
-                <FolderOpen className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="font-semibold text-sm">No assets found</p>
-                <p className="text-xs mt-1">Try changing filters or upload a new file.</p>
+            <div className="bg-card text-muted-foreground rounded-2xl border py-12 text-center shadow-sm">
+                <FolderOpen className="mx-auto mb-2 h-12 w-12 opacity-50" />
+                <p className="text-sm font-semibold">No assets found</p>
+                <p className="mt-1 text-xs">
+                    Try changing filters or upload a new file.
+                </p>
             </div>
         );
     }
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
             {files.map((file) => (
                 <MediaFileCard
                     key={file.id}

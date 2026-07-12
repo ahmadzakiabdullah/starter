@@ -1,8 +1,8 @@
-import { FileSearch, X, FileText, Copy, Edit2, Trash2 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Button } from '@/Components/ui/button';
+import { Copy, Edit2, FileSearch, FileText, Trash2, X } from 'lucide-react';
 import type { MediaFile } from '../types';
 
 interface MediaPreviewPanelProps {
@@ -13,70 +13,103 @@ interface MediaPreviewPanelProps {
     onDelete: (file: MediaFile) => void;
 }
 
-export default function MediaPreviewPanel({ file, onClose, onCopyLink, onRename, onDelete }: MediaPreviewPanelProps) {
+export default function MediaPreviewPanel({
+    file,
+    onClose,
+    onCopyLink,
+    onRename,
+    onDelete,
+}: MediaPreviewPanelProps) {
     const isImage = file.mime_type.startsWith('image/');
 
     return (
-        <div className="lg:col-span-1 animate-in slide-in-from-right-5 duration-200">
-            <Card className="sticky top-6 overflow-hidden border-primary/10 shadow-lg bg-card">
-                <div className="bg-primary/5 px-4 py-3 border-b flex items-center justify-between">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+        <div className="animate-in slide-in-from-right-5 duration-200 lg:col-span-1">
+            <Card className="border-primary/10 bg-card sticky top-6 overflow-hidden shadow-lg">
+                <div className="bg-primary/5 flex items-center justify-between border-b px-4 py-3">
+                    <h3 className="text-primary flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
                         <FileSearch className="h-4 w-4" />
                         Asset Details
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-muted-foreground hover:text-foreground p-1 hover:bg-accent rounded-lg"
+                        className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg p-1"
                     >
                         <X className="h-4 w-4" />
                     </button>
                 </div>
-                <CardContent className="p-4 space-y-4">
-                    <div className="aspect-video w-full rounded-lg bg-muted flex items-center justify-center overflow-hidden border">
+                <CardContent className="space-y-4 p-4">
+                    <div className="bg-muted flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border">
                         {isImage ? (
-                            <img src={file.url} className="max-h-full object-contain" alt="Selected Preview" />
+                            <img
+                                src={file.url}
+                                className="max-h-full object-contain"
+                                alt="Selected Preview"
+                            />
                         ) : (
-                            <FileText className="h-16 w-16 text-muted-foreground/60" />
+                            <FileText className="text-muted-foreground/60 h-16 w-16" />
                         )}
                     </div>
 
                     <div className="space-y-3">
                         <div>
-                            <Label className="text-[10px] text-muted-foreground uppercase">File Name</Label>
-                            <p className="text-xs font-bold text-foreground break-all">{file.name}</p>
+                            <Label className="text-muted-foreground text-[10px] uppercase">
+                                File Name
+                            </Label>
+                            <p className="text-foreground text-xs font-bold break-all">
+                                {file.name}
+                            </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 text-xs border-t pt-3">
+                        <div className="grid grid-cols-2 gap-2 border-t pt-3 text-xs">
                             <div>
-                                <Label className="text-[10px] text-muted-foreground uppercase">Size</Label>
-                                <p className="font-semibold text-foreground">{file.formatted_size}</p>
+                                <Label className="text-muted-foreground text-[10px] uppercase">
+                                    Size
+                                </Label>
+                                <p className="text-foreground font-semibold">
+                                    {file.formatted_size}
+                                </p>
                             </div>
                             <div>
-                                <Label className="text-[10px] text-muted-foreground uppercase">Mime Type</Label>
-                                <p className="font-semibold text-foreground truncate" title={file.mime_type}>
+                                <Label className="text-muted-foreground text-[10px] uppercase">
+                                    Mime Type
+                                </Label>
+                                <p
+                                    className="text-foreground truncate font-semibold"
+                                    title={file.mime_type}
+                                >
                                     {file.mime_type}
                                 </p>
                             </div>
                             <div>
-                                <Label className="text-[10px] text-muted-foreground uppercase">Folder</Label>
-                                <p className="font-semibold text-foreground capitalize">{file.folder || 'Root'}</p>
+                                <Label className="text-muted-foreground text-[10px] uppercase">
+                                    Folder
+                                </Label>
+                                <p className="text-foreground font-semibold capitalize">
+                                    {file.folder || 'Root'}
+                                </p>
                             </div>
                             <div>
-                                <Label className="text-[10px] text-muted-foreground uppercase">Uploaded At</Label>
-                                <p className="font-semibold text-foreground">
-                                    {new Date(file.created_at).toLocaleDateString()}
+                                <Label className="text-muted-foreground text-[10px] uppercase">
+                                    Uploaded At
+                                </Label>
+                                <p className="text-foreground font-semibold">
+                                    {new Date(
+                                        file.created_at,
+                                    ).toLocaleDateString()}
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     <div className="space-y-1.5 border-t pt-3">
-                        <Label className="text-[10px] text-muted-foreground uppercase">Public Web Link URL</Label>
+                        <Label className="text-muted-foreground text-[10px] uppercase">
+                            Public Web Link URL
+                        </Label>
                         <div className="flex items-center gap-1.5">
                             <Input
                                 readOnly
                                 value={file.url}
-                                className="h-8 text-xs bg-muted/40 font-mono"
+                                className="bg-muted/40 h-8 font-mono text-xs"
                             />
                             <Button
                                 onClick={() => onCopyLink(file.url)}
@@ -89,14 +122,14 @@ export default function MediaPreviewPanel({ file, onClose, onCopyLink, onRename,
                         </div>
                     </div>
 
-                    <div className="flex gap-2 pt-2 border-t">
+                    <div className="flex gap-2 border-t pt-2">
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => onRename(file)}
                             className="flex-1 text-xs"
                         >
-                            <Edit2 className="h-3 w-3 mr-1" />
+                            <Edit2 className="mr-1 h-3 w-3" />
                             Rename
                         </Button>
                         <Button
@@ -105,7 +138,7 @@ export default function MediaPreviewPanel({ file, onClose, onCopyLink, onRename,
                             onClick={() => onDelete(file)}
                             className="flex-1 text-xs"
                         >
-                            <Trash2 className="h-3 w-3 mr-1" />
+                            <Trash2 className="mr-1 h-3 w-3" />
                             Delete
                         </Button>
                     </div>

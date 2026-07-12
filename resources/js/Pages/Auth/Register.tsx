@@ -1,11 +1,11 @@
 import InputError from '@/Components/InputError';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import React, { FormEventHandler, useState } from 'react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import GuestLayout from '@/Layouts/GuestLayout';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -31,18 +31,20 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
 
-            <div className="space-y-1.5 mb-6 text-center">
-                <h1 className="text-xl font-bold tracking-tight text-foreground">
+            <div className="mb-6 space-y-1.5 text-center">
+                <h1 className="text-foreground text-xl font-bold tracking-tight">
                     Create an account
                 </h1>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                     Register a new profile to access the system dashboards.
                 </p>
             </div>
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-1">
-                    <Label htmlFor="name" className="text-xs font-semibold">Full Name</Label>
+                    <Label htmlFor="name" className="text-xs font-semibold">
+                        Full Name
+                    </Label>
                     <div className="relative">
                         <Input
                             id="name"
@@ -55,13 +57,18 @@ export default function Register() {
                             onChange={(e) => setData('name', e.target.value)}
                             required
                         />
-                        <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <User className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                     </div>
-                    <InputError message={errors.name} className="mt-1 text-[10px]" />
+                    <InputError
+                        message={errors.name}
+                        className="mt-1 text-[10px]"
+                    />
                 </div>
 
                 <div className="space-y-1">
-                    <Label htmlFor="username" className="text-xs font-semibold">Username</Label>
+                    <Label htmlFor="username" className="text-xs font-semibold">
+                        Username
+                    </Label>
                     <div className="relative">
                         <Input
                             id="username"
@@ -71,16 +78,23 @@ export default function Register() {
                             placeholder="johndoe"
                             className="pl-9 text-xs"
                             autoComplete="username"
-                            onChange={(e) => setData('username', e.target.value)}
+                            onChange={(e) =>
+                                setData('username', e.target.value)
+                            }
                             required
                         />
-                        <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <User className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                     </div>
-                    <InputError message={errors.username} className="mt-1 text-[10px]" />
+                    <InputError
+                        message={errors.username}
+                        className="mt-1 text-[10px]"
+                    />
                 </div>
 
                 <div className="space-y-1">
-                    <Label htmlFor="email" className="text-xs font-semibold">Email Address</Label>
+                    <Label htmlFor="email" className="text-xs font-semibold">
+                        Email Address
+                    </Label>
                     <div className="relative">
                         <Input
                             id="email"
@@ -93,13 +107,18 @@ export default function Register() {
                             onChange={(e) => setData('email', e.target.value)}
                             required
                         />
-                        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Mail className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                     </div>
-                    <InputError message={errors.email} className="mt-1 text-[10px]" />
+                    <InputError
+                        message={errors.email}
+                        className="mt-1 text-[10px]"
+                    />
                 </div>
 
                 <div className="space-y-1">
-                    <Label htmlFor="password" className="text-xs font-semibold">Password</Label>
+                    <Label htmlFor="password" className="text-xs font-semibold">
+                        Password
+                    </Label>
                     <div className="relative">
                         <Input
                             id="password"
@@ -107,26 +126,42 @@ export default function Register() {
                             name="password"
                             value={data.password}
                             placeholder="••••••••"
-                            className="pl-9 pr-9 text-xs"
+                            className="pr-9 pl-9 text-xs"
                             autoComplete="new-password"
-                            onChange={(e) => setData('password', e.target.value)}
+                            onChange={(e) =>
+                                setData('password', e.target.value)
+                            }
                             required
                         />
-                        <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Lock className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
-                            title={showPassword ? "Hide password" : "Show password"}
+                            className="text-muted-foreground hover:text-foreground absolute top-2.5 right-3"
+                            title={
+                                showPassword ? 'Hide password' : 'Show password'
+                            }
                         >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                            ) : (
+                                <Eye className="h-4 w-4" />
+                            )}
                         </button>
                     </div>
-                    <InputError message={errors.password} className="mt-1 text-[10px]" />
+                    <InputError
+                        message={errors.password}
+                        className="mt-1 text-[10px]"
+                    />
                 </div>
 
                 <div className="space-y-1">
-                    <Label htmlFor="password_confirmation" className="text-xs font-semibold">Confirm Password</Label>
+                    <Label
+                        htmlFor="password_confirmation"
+                        className="text-xs font-semibold"
+                    >
+                        Confirm Password
+                    </Label>
                     <div className="relative">
                         <Input
                             id="password_confirmation"
@@ -134,32 +169,54 @@ export default function Register() {
                             name="password_confirmation"
                             value={data.password_confirmation}
                             placeholder="••••••••"
-                            className="pl-9 pr-9 text-xs"
+                            className="pr-9 pl-9 text-xs"
                             autoComplete="new-password"
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
+                            onChange={(e) =>
+                                setData('password_confirmation', e.target.value)
+                            }
                             required
                         />
-                        <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Lock className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                         <button
                             type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
-                            title={showConfirmPassword ? "Hide password" : "Show password"}
+                            onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            className="text-muted-foreground hover:text-foreground absolute top-2.5 right-3"
+                            title={
+                                showConfirmPassword
+                                    ? 'Hide password'
+                                    : 'Show password'
+                            }
                         >
-                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showConfirmPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                            ) : (
+                                <Eye className="h-4 w-4" />
+                            )}
                         </button>
                     </div>
-                    <InputError message={errors.password_confirmation} className="mt-1 text-[10px]" />
+                    <InputError
+                        message={errors.password_confirmation}
+                        className="mt-1 text-[10px]"
+                    />
                 </div>
 
-                <Button className="w-full text-xs font-semibold mt-6" disabled={processing} type="submit">
+                <Button
+                    className="mt-6 w-full text-xs font-semibold"
+                    disabled={processing}
+                    type="submit"
+                >
                     {processing ? 'Registering...' : 'Register'}
                 </Button>
             </form>
 
-            <div className="mt-6 text-center text-xs text-muted-foreground border-t pt-4">
+            <div className="text-muted-foreground mt-6 border-t pt-4 text-center text-xs">
                 Already registered?{' '}
-                <Link href={route('login')} className="text-primary hover:underline font-semibold">
+                <Link
+                    href={route('login')}
+                    className="text-primary font-semibold hover:underline"
+                >
                     Sign in
                 </Link>
             </div>

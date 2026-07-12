@@ -1,10 +1,14 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
 import {
-  AdminStatsGrid,
-  TelemetryWidget,
-  RecentActivityWidget
-} from "@/Pages/DashboardComponents";
+    AdminStatsGrid,
+    RecentActivityWidget,
+} from '@/Pages/DashboardComponents';
+import { Head } from '@inertiajs/react';
+import React, { Suspense } from 'react';
+
+const TelemetryWidget = React.lazy(
+    () => import('@/Pages/DashboardComponents/TelemetryWidget'),
+);
 
 interface DashboardProps {
     stats: {
@@ -32,23 +36,35 @@ interface DashboardProps {
     };
 }
 
-export default function Dashboard({ stats, recentActivity, telemetry }: DashboardProps) {
-  return (
-    <AuthenticatedLayout>
-      <Head title="Dashboard" />
+export default function Dashboard({
+    stats,
+    recentActivity,
+    telemetry,
+}: DashboardProps) {
+    return (
+        <AuthenticatedLayout>
+            <Head title="Dashboard" />
 
-      <div className="space-y-6">
-        <h1 className="text-xl font-bold tracking-tight lg:text-2xl">Dashboard</h1>
+            <div className="space-y-6">
+                <h1 className="text-xl font-bold tracking-tight lg:text-2xl">
+                    Dashboard
+                </h1>
 
-        {/* Dynamic Admin statistics grid */}
-        <AdminStatsGrid stats={stats} />
+                {/* Dynamic Admin statistics grid */}
+                <AdminStatsGrid stats={stats} />
 
-        {/* Core telemetry and activity cards */}
-        <div className="gap-4 space-y-4 lg:grid lg:grid-cols-2 lg:space-y-0">
-          <TelemetryWidget telemetry={telemetry} />
-          <RecentActivityWidget recentActivity={recentActivity} />
-        </div>
-      </div>
-    </AuthenticatedLayout>
-  );
+                {/* Core telemetry and activity cards */}
+                <div className="gap-4 space-y-4 lg:grid lg:grid-cols-2 lg:space-y-0">
+                    <Suspense
+                        fallback={
+                            <div className="bg-muted/20 h-[300px] animate-pulse rounded-xl" />
+                        }
+                    >
+                        <TelemetryWidget telemetry={telemetry} />
+                    </Suspense>
+                    <RecentActivityWidget recentActivity={recentActivity} />
+                </div>
+            </div>
+        </AuthenticatedLayout>
+    );
 }

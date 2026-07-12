@@ -1,12 +1,12 @@
 import {
     AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
     AlertDialogDescription,
     AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from '@/Components/ui/alert-dialog';
 
 interface ConfirmDeleteDialogProps {
@@ -17,17 +17,30 @@ interface ConfirmDeleteDialogProps {
     onCancel: () => void;
 }
 
-export default function ConfirmDeleteDialog({ open, title, description, onConfirm, onCancel }: ConfirmDeleteDialogProps) {
+export default function ConfirmDeleteDialog({
+    open,
+    title,
+    description,
+    onConfirm,
+    onCancel,
+}: ConfirmDeleteDialogProps) {
     return (
         <AlertDialog open={open} onOpenChange={(open) => !open && onCancel()}>
             <AlertDialogContent className="rounded-2xl">
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>
-                    <AlertDialogDescription>{description}</AlertDialogDescription>
+                    <AlertDialogDescription>
+                        {description}
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="gap-2">
-                    <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialogCancel onClick={onCancel}>
+                        Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={onConfirm}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
                         Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>

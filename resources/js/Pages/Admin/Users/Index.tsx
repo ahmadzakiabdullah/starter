@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router, usePage } from '@inertiajs/react';
 import { AvatarInitials } from '@/Components/ui/avatar-initials';
-import { toast } from 'sonner';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardHeader } from '@/Components/ui/card';
+import { Input } from '@/Components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/Components/ui/select';
 import {
     Table,
     TableBody,
@@ -11,31 +17,25 @@ import {
     TableHeader,
     TableRow,
 } from '@/Components/ui/table';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/Components/ui/select';
-import { 
-    Edit2, 
-    Plus, 
-    Search, 
-    Trash2, 
-    Users, 
-    X, 
-    Shield, 
-    ShieldCheck, 
-    Clock, 
-    ArrowUpDown, 
+    ArrowUpDown,
+    Clock,
+    Edit2,
     FileSpreadsheet,
     MailCheck,
-    MailX
+    MailX,
+    Plus,
+    Search,
+    Shield,
+    ShieldCheck,
+    Trash2,
+    Users,
+    X,
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Role {
     id: number;
@@ -85,11 +85,19 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
     const { auth, flash } = usePage().props as any;
     const currentUser = auth.user;
 
-    const [search, setSearch] = useState(typeof filters?.search === 'string' ? filters.search : '');
-    const [selectedRole, setSelectedRole] = useState(typeof filters?.role === 'string' ? filters.role : 'all');
-    const [selectedStatus, setSelectedStatus] = useState(typeof filters?.status === 'string' ? filters.status : 'all');
-    const [selectedSort, setSelectedSort] = useState(typeof filters?.sort === 'string' ? filters.sort : 'newest');
-    
+    const [search, setSearch] = useState(
+        typeof filters?.search === 'string' ? filters.search : '',
+    );
+    const [selectedRole, setSelectedRole] = useState(
+        typeof filters?.role === 'string' ? filters.role : 'all',
+    );
+    const [selectedStatus, setSelectedStatus] = useState(
+        typeof filters?.status === 'string' ? filters.status : 'all',
+    );
+    const [selectedSort, setSelectedSort] = useState(
+        typeof filters?.sort === 'string' ? filters.sort : 'newest',
+    );
+
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     useEffect(() => {
@@ -129,7 +137,12 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
         router.get(route('users.index'));
     };
 
-    const applyFilters = (searchVal: string, roleVal: string, statusVal: string, sortVal: string) => {
+    const applyFilters = (
+        searchVal: string,
+        roleVal: string,
+        statusVal: string,
+        sortVal: string,
+    ) => {
         router.get(
             route('users.index'),
             {
@@ -141,7 +154,7 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
             {
                 preserveState: true,
                 replace: true,
-            }
+            },
         );
     };
 
@@ -149,67 +162,103 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
         if (confirm('Are you sure you want to delete this user?')) {
             router.delete(route('users.destroy', username), {
                 onSuccess: () => {
-                    setSelectedIds(selectedIds.filter(val => val !== id));
+                    setSelectedIds(selectedIds.filter((val) => val !== id));
                 },
             });
         }
     };
 
     const handleToggleVerification = (username: string) => {
-        router.patch(route('users.toggle-verification', username), {}, {
-            preserveScroll: true,
-            onSuccess: (page) => {
-                const updatedFlash = page.props.flash as { success?: string };
-                if (updatedFlash.success) {
-                    toast.success(updatedFlash.success);
-                }
-            }
-        });
+        router.patch(
+            route('users.toggle-verification', username),
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    const updatedFlash = page.props.flash as {
+                        success?: string;
+                    };
+                    if (updatedFlash.success) {
+                        toast.success(updatedFlash.success);
+                    }
+                },
+            },
+        );
     };
 
     const handleBulkExport = () => {
-        const selectedUsers = users.data.filter(u => selectedIds.includes(u.id));
+        const selectedUsers = users.data.filter((u) =>
+            selectedIds.includes(u.id),
+        );
         if (selectedUsers.length === 0) return;
 
-        const headers = ["ID", "Name", "Username", "Email", "Roles", "Verified"];
-        const rows = selectedUsers.map(u => [
+        const headers = [
+            'ID',
+            'Name',
+            'Username',
+            'Email',
+            'Roles',
+            'Verified',
+        ];
+        const rows = selectedUsers.map((u) => [
             u.id,
             `"${u.name.replace(/"/g, '""')}"`,
             u.username,
             u.email,
-            u.roles.map(r => r.name).join(', '),
-            u.email_verified_at ? 'Yes' : 'No'
+            u.roles.map((r) => r.name).join(', '),
+            u.email_verified_at ? 'Yes' : 'No',
         ]);
 
-        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-        
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const csvContent = [
+            headers.join(','),
+            ...rows.map((r) => r.join(',')),
+        ].join('\n');
+
+        const blob = new Blob([csvContent], {
+            type: 'text/csv;charset=utf-8;',
+        });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `users_export_${new Date().toISOString().slice(0,10)}.csv`);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute(
+            'download',
+            `users_export_${new Date().toISOString().slice(0, 10)}.csv`,
+        );
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast.success(`Exported ${selectedUsers.length} users to CSV successfully.`);
+        toast.success(
+            `Exported ${selectedUsers.length} users to CSV successfully.`,
+        );
     };
 
     const handleBulkDelete = () => {
-        if (confirm(`Are you sure you want to delete the ${selectedIds.length} selected users?`)) {
-            router.post(route('users.bulk-destroy'), { ids: selectedIds }, {
-                onSuccess: (page) => {
-                    const resFlash = page.props.flash as { success?: string, error?: string };
-                    if (resFlash.success) {
-                        toast.success(resFlash.success);
-                        setSelectedIds([]);
-                    } else if (resFlash.error) {
-                        toast.error(resFlash.error);
-                    }
+        if (
+            confirm(
+                `Are you sure you want to delete the ${selectedIds.length} selected users?`,
+            )
+        ) {
+            router.post(
+                route('users.bulk-destroy'),
+                { ids: selectedIds },
+                {
+                    onSuccess: (page) => {
+                        const resFlash = page.props.flash as {
+                            success?: string;
+                            error?: string;
+                        };
+                        if (resFlash.success) {
+                            toast.success(resFlash.success);
+                            setSelectedIds([]);
+                        } else if (resFlash.error) {
+                            toast.error(resFlash.error);
+                        }
+                    },
+                    onError: () => {
+                        toast.error('An error occurred during bulk deletion.');
+                    },
                 },
-                onError: () => {
-                    toast.error('An error occurred during bulk deletion.');
-                }
-            });
+            );
         }
     };
 
@@ -226,7 +275,9 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
         }
     };
 
-    const assignableCount = users.data.filter(u => u.id !== currentUser.id).length;
+    const assignableCount = users.data.filter(
+        (u) => u.id !== currentUser.id,
+    ).length;
 
     return (
         <AuthenticatedLayout>
@@ -237,11 +288,12 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-                            <Users className="h-6 w-6 text-primary" />
+                            <Users className="text-primary h-6 w-6" />
                             User Management
                         </h1>
-                        <p className="text-sm text-muted-foreground">
-                            Manage user profiles, accounts, custom avatars, and system access roles.
+                        <p className="text-muted-foreground text-sm">
+                            Manage user profiles, accounts, custom avatars, and
+                            system access roles.
                         </p>
                     </div>
                     <div>
@@ -256,88 +308,131 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
 
                 {/* Statistics Grid */}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <Card className="bg-card/45 backdrop-blur shadow-xs border border-muted/50">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Profiles</span>
-                            <Users className="h-4.5 w-4.5 text-primary" />
+                    <Card className="bg-card/45 border-muted/50 border shadow-xs backdrop-blur">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                                Total Profiles
+                            </span>
+                            <Users className="text-primary h-4.5 w-4.5" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight">{stats.total}</div>
-                            <p className="text-xs text-muted-foreground mt-0.5">Registered accounts</p>
+                            <div className="text-2xl font-bold tracking-tight">
+                                {stats.total}
+                            </div>
+                            <p className="text-muted-foreground mt-0.5 text-xs">
+                                Registered accounts
+                            </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-card/45 backdrop-blur shadow-xs border border-muted/50">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Administrators</span>
+                    <Card className="bg-card/45 border-muted/50 border shadow-xs backdrop-blur">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                                Administrators
+                            </span>
                             <Shield className="h-4.5 w-4.5 text-indigo-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight">{stats.admins}</div>
-                            <p className="text-xs text-muted-foreground mt-0.5">Admins & Superadmins</p>
+                            <div className="text-2xl font-bold tracking-tight">
+                                {stats.admins}
+                            </div>
+                            <p className="text-muted-foreground mt-0.5 text-xs">
+                                Admins & Superadmins
+                            </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-card/45 backdrop-blur shadow-xs border border-muted/50">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Verified Accounts</span>
+                    <Card className="bg-card/45 border-muted/50 border shadow-xs backdrop-blur">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                                Verified Accounts
+                            </span>
                             <ShieldCheck className="h-4.5 w-4.5 text-green-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight">{stats.verified}</div>
-                            <p className="text-xs text-muted-foreground mt-0.5">Email verified</p>
+                            <div className="text-2xl font-bold tracking-tight">
+                                {stats.verified}
+                            </div>
+                            <p className="text-muted-foreground mt-0.5 text-xs">
+                                Email verified
+                            </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-card/45 backdrop-blur shadow-xs border border-muted/50">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Unverified Accounts</span>
+                    <Card className="bg-card/45 border-muted/50 border shadow-xs backdrop-blur">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                                Unverified Accounts
+                            </span>
                             <Clock className="h-4.5 w-4.5 text-amber-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight">{stats.unverified}</div>
-                            <p className="text-xs text-muted-foreground mt-0.5">Pending verifications</p>
+                            <div className="text-2xl font-bold tracking-tight">
+                                {stats.unverified}
+                            </div>
+                            <p className="text-muted-foreground mt-0.5 text-xs">
+                                Pending verifications
+                            </p>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Filters Panel */}
-                <div className="flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm">
-                    <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
-                        <form onSubmit={handleSearch} className="relative flex-1">
+                <div className="bg-card flex flex-col gap-4 rounded-xl border p-4 shadow-sm">
+                    <div className="flex flex-col items-stretch justify-between gap-3 lg:flex-row lg:items-center">
+                        <form
+                            onSubmit={handleSearch}
+                            className="relative flex-1"
+                        >
                             <Input
                                 placeholder="Search name, username, or email..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="pl-9 pr-8"
+                                className="pr-8 pl-9"
                             />
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Search className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
                             {search && (
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setSearch('');
-                                        applyFilters('', selectedRole, selectedStatus, selectedSort);
+                                        applyFilters(
+                                            '',
+                                            selectedRole,
+                                            selectedStatus,
+                                            selectedSort,
+                                        );
                                     }}
-                                    className="absolute right-2.5 top-2.5 rounded-full p-0.5 hover:bg-muted"
+                                    className="hover:bg-muted absolute top-2.5 right-2.5 rounded-full p-0.5"
                                 >
-                                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                                    <X className="text-muted-foreground h-3.5 w-3.5" />
                                 </button>
                             )}
                         </form>
 
-                        <div className="grid grid-cols-2 sm:flex sm:items-center gap-3">
+                        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
                             {/* Role Filter */}
                             <div className="space-y-1 sm:space-y-0">
-                                <Select value={selectedRole} onValueChange={handleRoleChange}>
+                                <Select
+                                    value={selectedRole}
+                                    onValueChange={handleRoleChange}
+                                >
                                     <SelectTrigger className="w-full sm:w-[150px]">
                                         <SelectValue placeholder="Role" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Roles</SelectItem>
+                                        <SelectItem value="all">
+                                            All Roles
+                                        </SelectItem>
                                         {roles.map((role) => (
-                                            <SelectItem key={role.id} value={role.name}>
-                                                {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                                            <SelectItem
+                                                key={role.id}
+                                                value={role.name}
+                                            >
+                                                {role.name
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    role.name.slice(1)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -346,38 +441,66 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
 
                             {/* Status Filter */}
                             <div className="space-y-1 sm:space-y-0">
-                                <Select value={selectedStatus} onValueChange={handleStatusChange}>
+                                <Select
+                                    value={selectedStatus}
+                                    onValueChange={handleStatusChange}
+                                >
                                     <SelectTrigger className="w-full sm:w-[150px]">
                                         <SelectValue placeholder="Verification" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Status</SelectItem>
-                                        <SelectItem value="verified">Verified</SelectItem>
-                                        <SelectItem value="unverified">Pending</SelectItem>
+                                        <SelectItem value="all">
+                                            All Status
+                                        </SelectItem>
+                                        <SelectItem value="verified">
+                                            Verified
+                                        </SelectItem>
+                                        <SelectItem value="unverified">
+                                            Pending
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             {/* Sort Selector */}
-                            <div className="space-y-1 sm:space-y-0 col-span-2 sm:col-span-1">
-                                <Select value={selectedSort} onValueChange={handleSortChange}>
+                            <div className="col-span-2 space-y-1 sm:col-span-1 sm:space-y-0">
+                                <Select
+                                    value={selectedSort}
+                                    onValueChange={handleSortChange}
+                                >
                                     <SelectTrigger className="w-full sm:w-[160px]">
-                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                        <span className="text-muted-foreground flex items-center gap-2">
                                             <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />
                                             <SelectValue placeholder="Sort order" />
                                         </span>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="newest">Newest first</SelectItem>
-                                        <SelectItem value="oldest">Oldest first</SelectItem>
-                                        <SelectItem value="name_asc">Name A-Z</SelectItem>
-                                        <SelectItem value="name_desc">Name Z-A</SelectItem>
+                                        <SelectItem value="newest">
+                                            Newest first
+                                        </SelectItem>
+                                        <SelectItem value="oldest">
+                                            Oldest first
+                                        </SelectItem>
+                                        <SelectItem value="name_asc">
+                                            Name A-Z
+                                        </SelectItem>
+                                        <SelectItem value="name_desc">
+                                            Name Z-A
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
-                            {(search || selectedRole !== 'all' || selectedStatus !== 'all' || selectedSort !== 'newest') && (
-                                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs w-full sm:w-auto mt-2 sm:mt-0">
+                            {(search ||
+                                selectedRole !== 'all' ||
+                                selectedStatus !== 'all' ||
+                                selectedSort !== 'newest') && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={clearFilters}
+                                    className="mt-2 w-full text-xs sm:mt-0 sm:w-auto"
+                                >
                                     Clear Filters
                                 </Button>
                             )}
@@ -386,22 +509,34 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                 </div>
 
                 {/* Table Section */}
-                <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+                <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-[50px] text-center">
                                     <input
                                         type="checkbox"
-                                        checked={assignableCount > 0 && selectedIds.length === assignableCount}
+                                        checked={
+                                            assignableCount > 0 &&
+                                            selectedIds.length ===
+                                                assignableCount
+                                        }
                                         onChange={(e) => {
                                             if (e.target.checked) {
-                                                setSelectedIds(users.data.filter(u => u.id !== currentUser.id).map(u => u.id));
+                                                setSelectedIds(
+                                                    users.data
+                                                        .filter(
+                                                            (u) =>
+                                                                u.id !==
+                                                                currentUser.id,
+                                                        )
+                                                        .map((u) => u.id),
+                                                );
                                             } else {
                                                 setSelectedIds([]);
                                             }
                                         }}
-                                        className="rounded border-input text-primary focus:ring-primary h-4 w-4"
+                                        className="border-input text-primary focus:ring-primary h-4 w-4 rounded"
                                     />
                                 </TableHead>
                                 <TableHead className="w-[60px]"></TableHead>
@@ -410,13 +545,18 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                 <TableHead>Email</TableHead>
                                 <TableHead>Verification</TableHead>
                                 <TableHead>Roles</TableHead>
-                                <TableHead className="w-[120px] text-right">Actions</TableHead>
+                                <TableHead className="w-[120px] text-right">
+                                    Actions
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {users.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="h-48 text-center text-muted-foreground">
+                                    <TableCell
+                                        colSpan={8}
+                                        className="text-muted-foreground h-48 text-center"
+                                    >
                                         <div className="flex flex-col items-center justify-center gap-2">
                                             <Users className="h-8 w-8 opacity-20" />
                                             <span>No users found.</span>
@@ -425,20 +565,36 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                 </TableRow>
                             ) : (
                                 users.data.map((user) => (
-                                    <TableRow key={user.id} className="hover:bg-muted/30">
+                                    <TableRow
+                                        key={user.id}
+                                        className="hover:bg-muted/30"
+                                    >
                                         <TableCell className="text-center">
                                             <input
                                                 type="checkbox"
-                                                checked={selectedIds.includes(user.id)}
-                                                disabled={user.id === currentUser.id}
+                                                checked={selectedIds.includes(
+                                                    user.id,
+                                                )}
+                                                disabled={
+                                                    user.id === currentUser.id
+                                                }
                                                 onChange={(e) => {
                                                     if (e.target.checked) {
-                                                        setSelectedIds([...selectedIds, user.id]);
+                                                        setSelectedIds([
+                                                            ...selectedIds,
+                                                            user.id,
+                                                        ]);
                                                     } else {
-                                                        setSelectedIds(selectedIds.filter(id => id !== user.id));
+                                                        setSelectedIds(
+                                                            selectedIds.filter(
+                                                                (id) =>
+                                                                    id !==
+                                                                    user.id,
+                                                            ),
+                                                        );
                                                     }
                                                 }}
-                                                className="rounded border-input text-primary focus:ring-primary h-4 w-4 disabled:opacity-30 disabled:cursor-not-allowed"
+                                                className="border-input text-primary focus:ring-primary h-4 w-4 rounded disabled:cursor-not-allowed disabled:opacity-30"
                                             />
                                         </TableCell>
                                         <TableCell>
@@ -448,24 +604,40 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                                 size="md"
                                             />
                                         </TableCell>
-                                        <TableCell className="font-medium text-foreground">{user.name}</TableCell>
-                                        <TableCell className="text-muted-foreground font-mono text-xs">@{user.username}</TableCell>
-                                        <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                                        <TableCell className="text-foreground font-medium">
+                                            {user.name}
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground font-mono text-xs">
+                                            @{user.username}
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {user.email}
+                                        </TableCell>
                                         <TableCell>
                                             <button
                                                 type="button"
-                                                onClick={() => handleToggleVerification(user.username)}
-                                                disabled={user.id === currentUser.id}
-                                                title={user.id === currentUser.id ? "Cannot toggle own state" : "Click to toggle verification status"}
-                                                className="focus:outline-none transition-transform active:scale-95 disabled:pointer-events-none"
+                                                onClick={() =>
+                                                    handleToggleVerification(
+                                                        user.username,
+                                                    )
+                                                }
+                                                disabled={
+                                                    user.id === currentUser.id
+                                                }
+                                                title={
+                                                    user.id === currentUser.id
+                                                        ? 'Cannot toggle own state'
+                                                        : 'Click to toggle verification status'
+                                                }
+                                                className="transition-transform focus:outline-none active:scale-95 disabled:pointer-events-none"
                                             >
                                                 {user.email_verified_at ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-600 border border-green-500/20">
+                                                    <span className="inline-flex items-center gap-1 rounded-full border border-green-500/20 bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600">
                                                         <MailCheck className="h-3 w-3 shrink-0" />
                                                         Verified
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                                                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600">
                                                         <MailX className="h-3 w-3 shrink-0" />
                                                         Pending
                                                     </span>
@@ -477,8 +649,8 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                                 {user.roles.map((role) => (
                                                     <span
                                                         key={role.id}
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${getRoleBadgeClass(
-                                                            role.name
+                                                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase ${getRoleBadgeClass(
+                                                            role.name,
                                                         )}`}
                                                     >
                                                         {role.name}
@@ -488,17 +660,35 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button variant="outline" size="icon" asChild className="h-8 w-8 hover:bg-primary/5 hover:text-primary">
-                                                    <Link href={route('users.edit', user.username)}>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    asChild
+                                                    className="hover:bg-primary/5 hover:text-primary h-8 w-8"
+                                                >
+                                                    <Link
+                                                        href={route(
+                                                            'users.edit',
+                                                            user.username,
+                                                        )}
+                                                    >
                                                         <Edit2 className="h-3.5 w-3.5" />
                                                     </Link>
                                                 </Button>
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
-                                                    onClick={() => handleDelete(user.username, user.id)}
-                                                    disabled={user.id === currentUser.id}
-                                                    className="h-8 w-8 text-destructive hover:bg-destructive/5 hover:text-destructive disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            user.username,
+                                                            user.id,
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        user.id ===
+                                                        currentUser.id
+                                                    }
+                                                    className="text-destructive hover:bg-destructive/5 hover:text-destructive h-8 w-8 disabled:cursor-not-allowed disabled:opacity-30"
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
                                                 </Button>
@@ -513,27 +703,27 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
 
                 {/* Floating Bulk Action Bar */}
                 {selectedIds.length > 0 && (
-                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center justify-between gap-6 px-6 py-3 rounded-full bg-card/80 backdrop-blur-xl border border-muted-foreground/20 shadow-2xl animate-in slide-in-from-bottom duration-200">
-                        <span className="text-sm font-semibold text-foreground">
+                    <div className="bg-card/80 border-muted-foreground/20 animate-in slide-in-from-bottom fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center justify-between gap-6 rounded-full border px-6 py-3 shadow-2xl backdrop-blur-xl duration-200">
+                        <span className="text-foreground text-sm font-semibold">
                             {selectedIds.length} profiles selected
                         </span>
                         <div className="flex items-center gap-3">
-                            <Button 
-                                type="button" 
-                                variant="outline" 
-                                size="sm" 
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
                                 onClick={handleBulkExport}
-                                className="rounded-full flex items-center gap-1.5 h-9"
+                                className="flex h-9 items-center gap-1.5 rounded-full"
                             >
                                 <FileSpreadsheet className="h-4 w-4" />
                                 Export CSV
                             </Button>
-                            <Button 
-                                type="button" 
-                                variant="destructive" 
-                                size="sm" 
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
                                 onClick={handleBulkDelete}
-                                className="rounded-full flex items-center gap-1.5 h-9"
+                                className="flex h-9 items-center gap-1.5 rounded-full"
                             >
                                 <Trash2 className="h-4 w-4" />
                                 Delete Selected
@@ -545,8 +735,9 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                 {/* Pagination */}
                 {users.last_page > 1 && (
                     <div className="flex items-center justify-between py-4">
-                        <div className="text-sm text-muted-foreground">
-                            Showing page {users.current_page} of {users.last_page} ({users.total} total users)
+                        <div className="text-muted-foreground text-sm">
+                            Showing page {users.current_page} of{' '}
+                            {users.last_page} ({users.total} total users)
                         </div>
                         <div className="flex items-center gap-1">
                             {users.links.map((link, idx) => {
@@ -557,7 +748,9 @@ export default function Index({ users, roles, stats, filters }: UsersProps) {
                                 return (
                                     <Button
                                         key={idx}
-                                        variant={link.active ? 'default' : 'outline'}
+                                        variant={
+                                            link.active ? 'default' : 'outline'
+                                        }
                                         size="sm"
                                         disabled={!link.url}
                                         asChild={!!link.url}

@@ -1,7 +1,13 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
-import { Label } from '@/Components/ui/label';
-import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/Components/ui/dialog';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 
 interface RenameDialogProps {
     open: boolean;
@@ -11,10 +17,16 @@ interface RenameDialogProps {
     onCancel: () => void;
 }
 
-export default function RenameDialog({ open, value, onValueChange, onSave, onCancel }: RenameDialogProps) {
+export default function RenameDialog({
+    open,
+    value,
+    onValueChange,
+    onSave,
+    onCancel,
+}: RenameDialogProps) {
     return (
         <Dialog open={open} onOpenChange={(open) => !open && onCancel()}>
-            <DialogContent className="max-w-md p-6 rounded-2xl gap-4">
+            <DialogContent className="max-w-md gap-4 rounded-2xl p-6">
                 <DialogHeader>
                     <DialogTitle>Rename Asset File</DialogTitle>
                 </DialogHeader>
