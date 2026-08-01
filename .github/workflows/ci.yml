@@ -15,6 +15,18 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -29,6 +41,9 @@ jobs:
           key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
           restore-keys: composer-${{ runner.os }}-
 
+      - name: Prepare database
+        run: touch database/database.sqlite
+
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -42,15 +57,3 @@ jobs:
 
       - name: Run PHP tests
         run: php artisan test
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install frontend dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
