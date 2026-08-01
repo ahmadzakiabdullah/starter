@@ -66,8 +66,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Load dynamic settings
-        if (Schema::hasTable('settings')) {
-            try {
+        try {
+            if (Schema::hasTable('settings')) {
                 $settings = Setting::values();
 
                 // 1. Dynamic password validation defaults
@@ -94,9 +94,9 @@ class AppServiceProvider extends ServiceProvider
                 } else {
                     config(['mail.default' => 'log']);
                 }
-            } catch (\Exception $e) {
-                // Prevent boot locking during migrations or local setups
             }
+        } catch (\Throwable $e) {
+            // Prevent boot locking during migrations or local setups
         }
     }
 
