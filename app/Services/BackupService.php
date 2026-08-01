@@ -61,7 +61,7 @@ class BackupService
             $createStatement = (array) DB::select("SHOW CREATE TABLE `{$quotedTable}`")[0];
             $contents .= $createStatement['Create Table'].";\n\n";
 
-            foreach (DB::table($table)->get() as $row) {
+            foreach (DB::table($table)->cursor() as $row) {
                 $rowValues = array_map(function ($value) use ($pdo): string {
                     return $value === null ? 'NULL' : $pdo->quote((string) $value);
                 }, (array) $row);
