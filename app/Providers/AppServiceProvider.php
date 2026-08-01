@@ -66,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Load dynamic settings
-        if (Schema::hasTable('settings')) {
+        if (app()->environment() !== 'testing' && ! app()->runningInConsole() && Schema::hasTable('settings')) {
             try {
                 $settings = Setting::values();
 
