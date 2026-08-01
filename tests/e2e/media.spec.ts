@@ -1,3 +1,7 @@
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
 
@@ -7,15 +11,15 @@ const ADMIN_PASSWORD = 'password';
 test.describe('Media Management', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/login');
-        await page.locator('input[type="email"]').fill(ADMIN_EMAIL);
-        await page.locator('input[type="password"]').fill(ADMIN_PASSWORD);
+        await page.locator('input[name="email"]').fill(ADMIN_EMAIL);
+        await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
         await page.locator('button[type="submit"]').click();
         await expect(page).toHaveURL(/\/dashboard/);
     });
 
     test('uploads a media file', async ({ page }) => {
         await page.goto('/dashboard/media');
-        await expect(page.locator('h1').or(page.locator('text=Media'))).toBeVisible();
+        await expect(page.locator('h1').first()).toBeVisible();
 
         const fileInput = page.locator('input[type="file"]').first();
         const testImage = path.resolve(__dirname, '../../tests/fixtures/test-image.png');
@@ -30,9 +34,9 @@ test.describe('Media Management', () => {
 
         const deleteButton = page.locator('button:has(svg.lucide-trash2), button:has(svg.lucide-trash)').first();
         if (await deleteButton.isVisible()) {
-            page.once('dialog', (dialog) => dialog.accept());
             await deleteButton.click();
-            await expect(page.locator('text=deleted').or(page.locator('text=success'))).toBeVisible({ timeout: 10000 });
+            await page.getByRole('button', { name: 'Delete' }).click();
+            await expect(page.locator('text=deleted').first()).toBeVisible({ timeout: 10000 });
         }
     });
 });
