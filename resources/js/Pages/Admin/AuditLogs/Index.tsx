@@ -310,6 +310,7 @@ export default function Index({ logs, events, filters }: AuditLogPageProps) {
                                             selectedEvent,
                                             dateFrom,
                                             dateTo,
+                                            perPage,
                                         );
                                     }}
                                     className="hover:bg-muted absolute top-2.5 right-2.5 rounded-full p-0.5"
