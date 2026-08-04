@@ -21,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Textarea } from '@/Components/ui/textarea';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm } from '@inertiajs/react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as LucideIcons from 'lucide-react';
 import React, { Suspense, useState } from 'react';
 import { toast } from 'sonner';
@@ -43,7 +43,6 @@ const {
     RefreshCw,
     Server,
     ShieldCheck,
-    AlertCircle,
 } = LucideIcons;
 
 interface Announcement {
@@ -130,6 +129,10 @@ const PRESET_ICONS = [
     'Workflow',
     'Heart',
 ];
+
+const getPresetIcon = (name: string | undefined) =>
+    (LucideIcons[name as keyof typeof LucideIcons] as LucideIcons.LucideIcon) ||
+    LucideIcons.Sparkles;
 
 export default function Edit({ settings, announcements }: SettingsProps) {
     const { data, setData, post, processing, errors } = useForm({
@@ -238,10 +241,14 @@ export default function Edit({ settings, announcements }: SettingsProps) {
             if (response.data.success) {
                 toast.success(response.data.message);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             const errMsg =
-                error.response?.data?.message || 'SMTP Connection failed.';
-            toast.error(errMsg, { duration: 5000 });
+                error instanceof AxiosError
+                    ? error.response?.data?.message
+                    : undefined;
+            toast.error(errMsg || 'SMTP Connection failed.', {
+                duration: 5000,
+            });
         } finally {
             setTestingSmtp(false);
         }
@@ -598,12 +605,9 @@ export default function Edit({ settings, announcements }: SettingsProps) {
                                                         {PRESET_ICONS.map(
                                                             (iconName) => {
                                                                 const Icon =
-                                                                    (
-                                                                        LucideIcons as any
-                                                                    )[
-                                                                        iconName
-                                                                    ] ||
-                                                                    LucideIcons.Sparkles;
+                                                                    getPresetIcon(
+                                                                        iconName,
+                                                                    );
                                                                 const isSelected =
                                                                     data.app_logo_icon ===
                                                                     iconName;
@@ -832,13 +836,9 @@ export default function Edit({ settings, announcements }: SettingsProps) {
                                                             <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg">
                                                                 {(() => {
                                                                     const Icon =
-                                                                        (
-                                                                            LucideIcons as any
-                                                                        )[
-                                                                            data
-                                                                                .app_logo_icon
-                                                                        ] ||
-                                                                        LucideIcons.Sparkles;
+                                                                        getPresetIcon(
+                                                                            data.app_logo_icon,
+                                                                        );
                                                                     return (
                                                                         <Icon className="animate-pulse-slow h-5 w-5 shrink-0" />
                                                                     );
@@ -906,13 +906,9 @@ export default function Edit({ settings, announcements }: SettingsProps) {
                                                             ) : (
                                                                 (() => {
                                                                     const Icon =
-                                                                        (
-                                                                            LucideIcons as any
-                                                                        )[
-                                                                            data
-                                                                                .app_logo_icon
-                                                                        ] ||
-                                                                        LucideIcons.Sparkles;
+                                                                        getPresetIcon(
+                                                                            data.app_logo_icon,
+                                                                        );
                                                                     return (
                                                                         <Icon className="text-primary h-5 w-5 shrink-0" />
                                                                     );

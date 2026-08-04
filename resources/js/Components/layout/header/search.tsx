@@ -21,7 +21,7 @@ import { DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 
 export default function Search() {
     const [open, setOpen] = useState(false);
-    const { auth } = usePage().props as any;
+    const { auth } = usePage().props;
     const user = auth?.user;
     const navGroups = getNavGroups(user);
 

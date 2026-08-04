@@ -10,7 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
-import { THEMES } from '@/lib/themes';
+import { THEMES, type ThemeType } from '@/lib/themes';
 import { usePage } from '@inertiajs/react';
 import { Check, Monitor, MoonIcon, Palette, SunIcon } from 'lucide-react';
 import { useTheme as useNextTheme } from 'next-themes';
@@ -21,7 +21,7 @@ export default function ThemeSwitch() {
     const { theme: mode, setTheme: setMode } = useNextTheme();
     const { theme: config, setTheme: setConfig } = useThemeConfig();
     const { props: pageProps } = usePage();
-    const system = pageProps.system as any;
+    const system = pageProps.system;
     const showPresets = system?.module_theme_presets !== false;
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export default function ThemeSwitch() {
     const handlePresetSelect = (presetValue: string) => {
         setConfig({
             ...config,
-            preset: presetValue as any,
+            preset: presetValue as ThemeType['preset'],
         });
     };
 

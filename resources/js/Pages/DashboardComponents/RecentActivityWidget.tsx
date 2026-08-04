@@ -72,7 +72,7 @@ export default function RecentActivityWidget({
                     </div>
                 ) : (
                     <div className="border-muted relative space-y-4 border-l pl-4">
-                        {recentActivity.map((activity, idx) => (
+                        {recentActivity.map((activity) => (
                             <div
                                 key={activity.id}
                                 className="group relative text-xs"

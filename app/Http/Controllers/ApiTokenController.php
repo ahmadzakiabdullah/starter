@@ -26,10 +26,13 @@ class ApiTokenController extends Controller
                 return [
                     'id' => $token->id,
                     'name' => $token->name,
+                    'abilities' => $token->abilities,
                     'last_used_at' => $token->last_used_at ? $token->last_used_at->toIso8601String() : null,
                     'last_used_formatted' => $token->last_used_at ? $token->last_used_at->diffForHumans() : 'Never used',
                     'created_at' => $token->created_at->toIso8601String(),
                     'created_formatted' => $token->created_at->diffForHumans(),
+                    'expires_at' => $token->expires_at?->toIso8601String(),
+                    'expires_formatted' => $token->expires_at ? $token->expires_at->diffForHumans() : 'Never expires',
                 ];
             }),
         ]);
@@ -42,17 +45,23 @@ class ApiTokenController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'abilities' => ['nullable', 'array'],
+            'abilities.*' => ['in:user:read,users:read,roles:read,media:read,audit-logs:read'],
         ]);
 
         $tokenName = $request->input('name');
-        $token = $request->user()->createToken($tokenName);
+        $abilities = $request->input('abilities', ['user:read', 'users:read', 'roles:read', 'media:read', 'audit-logs:read']);
+        $token = $request->user()->createToken($tokenName, $abilities);
 
         return response()->json([
             'token' => [
                 'id' => $token->accessToken->id,
                 'name' => $token->accessToken->name,
+                'abilities' => $token->accessToken->abilities,
                 'created_at' => $token->accessToken->created_at->toIso8601String(),
                 'created_formatted' => $token->accessToken->created_at->diffForHumans(),
+                'expires_at' => $token->accessToken->expires_at?->toIso8601String(),
+                'expires_formatted' => $token->accessToken->expires_at ? $token->accessToken->expires_at->diffForHumans() : 'Never expires',
             ],
             'plainTextToken' => $token->plainTextToken,
         ], 201);

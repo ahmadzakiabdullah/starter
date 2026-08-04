@@ -21,8 +21,8 @@ import { Progress } from '@/Components/ui/progress';
 import { Link, usePage } from '@inertiajs/react';
 
 export default function UserMenu() {
-    const { auth } = usePage().props as any;
-    const user = auth.user;
+    const { auth } = usePage().props;
+    const user = auth.user!;
 
     return (
         <DropdownMenu>

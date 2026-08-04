@@ -23,7 +23,7 @@ class UpdateSettingsRequest extends FormRequest
             'default_language' => ['required', 'in:en,ms'],
             'email_notifications' => ['required', 'boolean'],
             'enable_registration' => ['required', 'boolean'],
-            'min_password_length' => ['required', 'integer', 'min:4', 'max:32'],
+            'min_password_length' => ['required', 'integer', 'min:8', 'max:32'],
             'session_lifetime' => ['required', 'integer', 'min:1', 'max:1440'],
             'module_notifications' => ['required', 'boolean'],
             'module_active_sessions' => ['required', 'boolean'],
@@ -46,8 +46,8 @@ class UpdateSettingsRequest extends FormRequest
             'app_logo_icon' => ['required_if:app_logo_type,icon', 'string'],
             'app_logo_image_url' => ['nullable', 'string'],
             'app_favicon_url' => ['nullable', 'string'],
-            'app_logo_file' => ['nullable', 'file', 'image', 'max:2048'],
-            'app_favicon_file' => ['nullable', 'file', 'mimes:ico,png,jpg,jpeg,svg', 'max:1048'],
+            'app_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'app_favicon_file' => ['nullable', 'file', 'mimes:ico,png,jpg,jpeg', 'max:1048'],
         ];
     }
 }

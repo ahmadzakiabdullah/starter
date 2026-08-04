@@ -14,7 +14,7 @@ class UploadMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'max:10240', 'mimes:jpg,jpeg,png,gif,webp,svg,bmp,ico,pdf,doc,docx,xls,xlsx,ppt,pptx,csv,txt,zip,rar,7z,mp4,mp3,mov,avi,webm'],
+            'file' => ['required', 'file', 'max:10240', 'mimes:jpg,jpeg,png,gif,webp,bmp,ico,pdf,doc,docx,xls,xlsx,ppt,pptx,csv,txt,zip,rar,7z,mp4,mp3,mov,avi,webm'],
             'folder' => ['nullable', 'string', 'max:50'],
         ];
     }

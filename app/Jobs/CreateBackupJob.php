@@ -15,7 +15,7 @@ class CreateBackupJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public function __construct(
-        private readonly ?User $actor = null,
+        private readonly ?int $actorId = null,
     ) {}
 
     public function handle(BackupService $backups): void
@@ -24,7 +24,7 @@ class CreateBackupJob implements ShouldQueue
             $filename = $backups->create();
 
             AuditLog::record(
-                $this->actor,
+                $this->actorId !== null ? User::find($this->actorId) : null,
                 'backup.created',
                 null,
                 "Created database backup archive: {$filename}",
@@ -36,7 +36,7 @@ class CreateBackupJob implements ShouldQueue
         } catch (\Exception $e) {
             Log::error('Database backup failed', [
                 'error' => $e->getMessage(),
-                'actor' => $this->actor?->id,
+                'actor' => $this->actorId,
             ]);
         }
     }

@@ -77,17 +77,20 @@ class ProfileController extends Controller
      */
     public function enableTwoFactor(Request $request): RedirectResponse
     {
-        $google2fa = new Google2FA;
+        $google2fa = new \PragmaRX\Google2FAQRCode\Google2FA;
         $secret = $google2fa->generateSecretKey();
 
-        $qrUrl = $google2fa->getQRCodeUrl(
+        // Generate the QR code locally as an inline data URI so the 2FA
+        // secret is never sent to a third-party QR service.
+        $qrInline = $google2fa->getQRCodeInline(
             config('app.name'),
             $request->user()->email,
-            $secret
+            $secret,
+            180
         );
 
         $request->session()->put('two_factor_secret', $secret);
-        $request->session()->put('two_factor_qr', $qrUrl);
+        $request->session()->put('two_factor_qr', $qrInline);
 
         return back();
     }

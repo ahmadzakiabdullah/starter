@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -21,11 +22,13 @@ class DashboardTest extends TestCase
     }
 
     /**
-     * Test authenticated users can view dashboard with props.
+     * Test staff (superadmin) users can view full dashboard metrics.
      */
-    public function test_authenticated_users_can_access_dashboard_with_required_metrics(): void
+    public function test_staff_users_can_access_dashboard_with_required_metrics(): void
     {
+        $role = Role::create(['name' => 'superadmin', 'guard_name' => 'web']);
         $user = User::factory()->create();
+        $user->assignRole($role);
 
         // Create a dummy audit log to ensure recentActivity is not empty
         AuditLog::create([
@@ -63,5 +66,34 @@ class DashboardTest extends TestCase
         $this->assertArrayHasKey('ram_percent', $viewProps['telemetry']);
         $this->assertArrayHasKey('disk_percent', $viewProps['telemetry']);
         $this->assertArrayHasKey('caches', $viewProps['telemetry']);
+    }
+
+    /**
+     * Test regular users are not exposed to admin-only metrics.
+     */
+    public function test_regular_users_do_not_receive_admin_metrics(): void
+    {
+        $user = User::factory()->create();
+
+        AuditLog::create([
+            'user_id' => $user->id,
+            'event' => 'user.logged_in',
+            'description' => 'User logged in to panel',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertStatus(200);
+
+        $viewProps = $response->viewData('page')['props'];
+
+        // Admin-only counts must not be exposed to regular users
+        $this->assertNull($viewProps['stats']['total_users']);
+        $this->assertNull($viewProps['stats']['total_roles']);
+        $this->assertNull($viewProps['stats']['total_backups']);
+        $this->assertEmpty($viewProps['recentActivity']);
+        $this->assertNull($viewProps['telemetry']['cpu_percent']);
+        $this->assertNull($viewProps['telemetry']['ram_percent']);
+        $this->assertNull($viewProps['telemetry']['disk_percent']);
     }
 }

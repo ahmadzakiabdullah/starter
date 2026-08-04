@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
 
 export default function Guest({ children }: PropsWithChildren) {
-    const { system } = usePage().props as any;
+    const { system } = usePage().props;
 
     return (
         <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-50 p-4 transition-colors duration-300 dark:bg-slate-950">

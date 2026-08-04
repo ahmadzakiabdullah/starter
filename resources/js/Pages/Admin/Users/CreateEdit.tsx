@@ -51,7 +51,7 @@ interface CreateEditProps {
 
 export default function CreateEdit({ user, roles }: CreateEditProps) {
     const isEdit = !!user;
-    const { auth } = usePage().props as any;
+    const { auth } = usePage().props;
     const currentUser = auth.user;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(

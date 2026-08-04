@@ -31,7 +31,7 @@ type Notification = {
 
 const Notifications = () => {
     const isMobile = useIsMobile();
-    const { notifications } = usePage().props as any;
+    const { notifications } = usePage().props;
     const unreadCount = notifications?.unread_count ?? 0;
     const items = notifications?.items ?? [];
 

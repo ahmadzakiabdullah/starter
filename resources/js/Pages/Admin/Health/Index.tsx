@@ -133,7 +133,7 @@ export default function Index({
     dbStats,
 }: HealthPageProps) {
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props;
 
     useEffect(() => {
         if (flash?.success) {

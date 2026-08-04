@@ -30,28 +30,22 @@ import SessionsManager from './Partials/SessionsManager';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 
-interface SessionItem {
-    id: string;
-    ip_address: string | null;
-    browser: string;
-    platform: string;
-    is_current: boolean;
-    last_active: string;
-}
-
 interface EditProps {
     mustVerifyEmail: boolean;
     status?: string;
-    sessions: SessionItem[];
     twoFactorEnabled: boolean;
     twoFactorSecret: string | null;
     twoFactorQrCodeUrl: string | null;
 }
 
+interface SystemFlags {
+    module_active_sessions?: boolean;
+    module_api_keys?: boolean;
+}
+
 export default function Edit({
     mustVerifyEmail,
     status,
-    sessions,
     twoFactorEnabled,
     twoFactorSecret,
     twoFactorQrCodeUrl,
@@ -110,7 +104,7 @@ export default function Edit({
     };
 
     const { props: pageProps } = usePage();
-    const system = pageProps.system as any;
+    const system = pageProps.system as SystemFlags | undefined;
     const showSessions = system?.module_active_sessions !== false;
     const showApiKeys = system?.module_api_keys !== false;
 
@@ -234,9 +228,9 @@ export default function Edit({
                             ) : twoFactorQrCodeUrl ? (
                                 <div className="bg-muted/10 grid gap-6 rounded-xl border p-4 md:grid-cols-2">
                                     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-white p-4 dark:bg-slate-950">
-                                        {/* Render QR code via Google APIs / QRServer client side */}
+                                        {/* QR code rendered from a server-side inline data URI */}
                                         <img
-                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(twoFactorQrCodeUrl)}`}
+                                            src={twoFactorQrCodeUrl}
                                             alt="Google Authenticator QR Code"
                                             className="h-44 w-44 rounded border bg-white object-contain p-1.5 shadow-xs"
                                         />

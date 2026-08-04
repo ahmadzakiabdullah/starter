@@ -3,6 +3,7 @@
 import { useThemeConfig } from '@/components/active-theme';
 import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import type { ThemeType } from '@/lib/themes';
 import { BanIcon } from 'lucide-react';
 
 export function ThemeScaleSelector() {
@@ -16,7 +17,10 @@ export function ThemeScaleSelector() {
                     value={theme.scale}
                     type="single"
                     onValueChange={(value) =>
-                        setTheme({ ...theme, scale: value as any })
+                        setTheme({
+                            ...theme,
+                            scale: value as ThemeType['scale'],
+                        })
                     }
                     className="*:border-input w-full gap-3 *:rounded-md *:border"
                 >

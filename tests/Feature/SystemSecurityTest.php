@@ -95,15 +95,20 @@ class SystemSecurityTest extends TestCase
             ->assertRedirect()
             ->assertSessionHas('success');
 
-        // 3. Manually create a dummy backup file to test index, download, and delete
+        // 3. Manually create a dummy (validly encrypted) backup file to test index, download, and delete
         $backupDir = storage_path('app/backups');
         if (! file_exists($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
 
-        $backupFilename = 'backup_test_file.sql';
+        $backupFilename = 'backup_test_file.enc';
         $backupFilepath = $backupDir.'/'.$backupFilename;
-        file_put_contents($backupFilepath, '-- Dummy SQL Backup content');
+        $salt = random_bytes(16);
+        $key = hash_hmac('sha256', 'laravel-backup:'.$salt, (string) config('app.key'), true);
+        $nonce = pack('J', 0).random_bytes(4);
+        $tag = '';
+        $ciphertext = openssl_encrypt('-- Dummy SQL Backup content', 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $nonce, $tag);
+        file_put_contents($backupFilepath, 'ENC1'.$salt.pack('N', strlen($ciphertext)).$nonce.$ciphertext.$tag);
 
         try {
             // Verify it shows up in index list

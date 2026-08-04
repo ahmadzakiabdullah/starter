@@ -379,8 +379,10 @@ export default function AnnouncementSettings({
                                         </Label>
                                         <Select
                                             value={style}
-                                            onValueChange={(val: any) =>
-                                                setStyle(val)
+                                            onValueChange={(val) =>
+                                                setStyle(
+                                                    val as Announcement['style'],
+                                                )
                                             }
                                         >
                                             <SelectTrigger

@@ -32,7 +32,10 @@ interface BackupsPageProps {
 }
 
 export default function Index({ backups }: BackupsPageProps) {
-    const { flash } = usePage().props as any;
+    const { props } = usePage();
+    const flash = props.flash as
+        | { success?: string; error?: string }
+        | undefined;
 
     useEffect(() => {
         if (flash?.success) {

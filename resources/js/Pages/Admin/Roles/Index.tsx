@@ -52,7 +52,7 @@ interface IndexProps {
 }
 
 export default function Index({ roles, permissions }: IndexProps) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props;
     const [editingRole, setEditingRole] = useState<Role | null>(null);
 
     // Form for Role operations (Create / Edit)

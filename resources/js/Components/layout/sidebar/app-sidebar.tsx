@@ -48,11 +48,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     useEffect(() => {
         if (isMobile) setOpenMobile(false);
-    }, [pathname]);
+    }, [pathname, isMobile, setOpenMobile]);
 
     useEffect(() => {
         setOpen(!isTablet);
-    }, [isTablet]);
+    }, [isTablet, setOpen]);
 
     return (
         <Sidebar collapsible="icon" {...props}>

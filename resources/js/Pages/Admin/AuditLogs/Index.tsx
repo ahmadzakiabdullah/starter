@@ -49,8 +49,8 @@ interface AuditLog {
     description: string;
     actor: { name: string; username: string } | null;
     created_at: string;
-    old_values: any;
-    new_values: any;
+    old_values: Record<string, unknown> | null;
+    new_values: Record<string, unknown> | null;
     ip_address: string | null;
     user_agent: string | null;
     auditable_type: string | null;
@@ -81,7 +81,9 @@ interface AuditLogPageProps {
 }
 
 export default function Index({ logs, events, filters }: AuditLogPageProps) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props as {
+        flash?: { success?: string; error?: string };
+    };
 
     const [search, setSearch] = useState(filters.search || '');
     const [selectedEvent, setSelectedEvent] = useState(filters.event || 'all');
@@ -179,7 +181,7 @@ export default function Index({ logs, events, filters }: AuditLogPageProps) {
         }
     };
 
-    const formatVal = (val: any) => {
+    const formatVal = (val: unknown) => {
         if (val === null || val === undefined)
             return (
                 <span className="text-muted-foreground/40 italic">null</span>

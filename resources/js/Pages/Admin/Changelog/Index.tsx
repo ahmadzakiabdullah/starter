@@ -62,7 +62,7 @@ interface ChangelogPageProps {
 }
 
 export default function Index({ changelogs, canManage }: ChangelogPageProps) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props;
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingLog, setEditingLog] = useState<Changelog | null>(null);
@@ -132,9 +132,9 @@ export default function Index({ changelogs, canManage }: ChangelogPageProps) {
         form.setData('changes', updated);
     };
 
-    const handleChangeItemType = (index: number, type: any) => {
+    const handleChangeItemType = (index: number, type: string) => {
         const updated = [...form.data.changes];
-        updated[index].type = type;
+        updated[index].type = type as ChangeItem['type'];
         form.setData('changes', updated);
     };
 

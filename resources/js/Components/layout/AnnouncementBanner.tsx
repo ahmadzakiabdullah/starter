@@ -9,15 +9,8 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-interface Announcement {
-    id: number;
-    title: string;
-    content: string;
-    style: 'info' | 'warning' | 'danger' | 'success';
-}
-
 export default function AnnouncementBanner() {
-    const { active_announcement, system } = usePage().props as any;
+    const { active_announcement, system } = usePage().props;
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {

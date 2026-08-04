@@ -33,14 +33,14 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])->name('two-factor.login');
-Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store'])->middleware('throttle:5,1');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/two-factor', [ProfileController::class, 'enableTwoFactor'])->name('profile.two-factor.enable');
-    Route::post('/profile/two-factor/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('profile.two-factor.confirm');
+    Route::post('/profile/two-factor/confirm', [ProfileController::class, 'confirmTwoFactor'])->middleware('throttle:5,1')->name('profile.two-factor.confirm');
     Route::post('/profile/two-factor/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.two-factor.disable');
     Route::post('/profile/sessions/logout', [ProfileController::class, 'logoutOtherDevices'])->name('profile.sessions.logout');
     Route::get('/profile/sessions', [SessionController::class, 'getActiveSessions'])->name('profile.sessions.index');
@@ -94,12 +94,14 @@ Route::middleware('auth')->group(function () {
     // Media Manager
     Route::get('dashboard/media', [MediaController::class, 'index'])->name('media.index');
     Route::post('dashboard/media/upload', [MediaController::class, 'upload'])->name('media.upload');
-    Route::patch('dashboard/media/{media}/rename', [MediaController::class, 'rename'])->name('media.rename');
-    Route::delete('dashboard/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
-    Route::post('dashboard/media/bulk-destroy', [MediaController::class, 'bulkDestroy'])->name('media.bulk-destroy');
+    // Folder routes must be registered before the model-bound media routes
+    // so a folder named "folders" cannot be shadowed by the {media} binding.
     Route::get('dashboard/media/folders', [MediaController::class, 'listFolders'])->name('media.folders');
     Route::post('dashboard/media/folders', [MediaController::class, 'createFolder'])->name('media.folders.create');
     Route::delete('dashboard/media/folders/{folder}', [MediaController::class, 'deleteFolder'])->name('media.folders.destroy');
+    Route::patch('dashboard/media/{media}/rename', [MediaController::class, 'rename'])->name('media.rename');
+    Route::delete('dashboard/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+    Route::post('dashboard/media/bulk-destroy', [MediaController::class, 'bulkDestroy'])->name('media.bulk-destroy');
 
     Route::get('dashboard/health', [HealthMonitorController::class, 'index'])->name('health.index');
 });

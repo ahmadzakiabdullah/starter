@@ -25,6 +25,7 @@ import {
     SidebarMenuSubItem,
     useSidebar,
 } from '@/Components/ui/sidebar';
+import type { User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
     ActivityIcon,
@@ -58,7 +59,7 @@ export type NavGroup = {
     items: NavItem[];
 };
 
-export function getNavGroups(user: any): NavGroup[] {
+export function getNavGroups(user: User | null): NavGroup[] {
     const superadmin = user?.roles?.includes('superadmin');
     const canManageUsers =
         user?.permissions?.includes('manage-users') || superadmin;
@@ -174,7 +175,7 @@ export function NavMain() {
     const { url } = usePage();
     const pathname = url;
     const { isMobile } = useSidebar();
-    const { auth } = usePage().props as any;
+    const { auth } = usePage().props;
     const user = auth?.user;
 
     const navGroups = getNavGroups(user);

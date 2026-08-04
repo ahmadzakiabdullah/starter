@@ -3,6 +3,7 @@
 import { useThemeConfig } from '@/components/active-theme';
 import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import type { ThemeType } from '@/lib/themes';
 import { BanIcon } from 'lucide-react';
 
 export function ThemeRadiusSelector() {
@@ -15,7 +16,7 @@ export function ThemeRadiusSelector() {
                 value={theme.radius}
                 type="single"
                 onValueChange={(value) =>
-                    setTheme({ ...theme, radius: value as any })
+                    setTheme({ ...theme, radius: value as ThemeType['radius'] })
                 }
                 className="*:border-input w-full gap-3 *:rounded-md *:border"
             >

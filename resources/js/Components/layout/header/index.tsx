@@ -15,7 +15,7 @@ import { usePage } from '@inertiajs/react';
 export function SiteHeader() {
     const { toggleSidebar } = useSidebar();
     const { props: pageProps } = usePage();
-    const system = pageProps.system as any;
+    const system = pageProps.system;
     const showNotifications = system?.module_notifications !== false;
 
     return (

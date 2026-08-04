@@ -21,7 +21,7 @@ class StoreUserRequest extends FormRequest
             'password' => ['required', Rules\Password::defaults()],
             'roles' => ['required', 'array'],
             'roles.*' => ['string', 'exists:roles,name'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            'avatar' => ['nullable', 'file', 'max:2048', 'mimes:jpg,jpeg,png,webp,gif'],
             'email_verified' => ['required', 'boolean'],
         ];
     }

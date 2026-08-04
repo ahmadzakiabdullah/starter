@@ -64,7 +64,7 @@ class HandleInertiaRequests extends Middleware
                         'created_at' => $notification->created_at->toIso8601String(),
                     ]),
             ] : ['unread_count' => 0, 'items' => []],
-            'system' => fn () => Setting::values(),
+            'system' => fn () => Setting::publicValues(),
             'app_version' => fn () => Changelog::latestVersion(),
             'active_announcement' => fn () => Announcement::active(),
         ];

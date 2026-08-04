@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\SystemSettingsUpdated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
@@ -39,7 +40,7 @@ class SystemSettingsController extends Controller
 
         // Process logo image upload
         if ($request->hasFile('app_logo_file')) {
-            $path = $request->file('app_logo_file')->store('branding', 'public');
+            $path = $this->storeBrandingFile($request->file('app_logo_file'));
             $values['app_logo_image'] = '/storage/'.$path;
         } else {
             $values['app_logo_image'] = $request->input('app_logo_image_url') ?? ($oldValues['app_logo_image'] ?? '');
@@ -47,7 +48,7 @@ class SystemSettingsController extends Controller
 
         // Process favicon upload
         if ($request->hasFile('app_favicon_file')) {
-            $path = $request->file('app_favicon_file')->store('branding', 'public');
+            $path = $this->storeBrandingFile($request->file('app_favicon_file'));
             $values['app_favicon'] = '/storage/'.$path;
         } else {
             $values['app_favicon'] = $request->input('app_favicon_url') ?? ($oldValues['app_favicon'] ?? '');
@@ -66,8 +67,8 @@ class SystemSettingsController extends Controller
             'system.settings.updated',
             null,
             'Updated system settings.',
-            $oldValues,
-            $values,
+            $this->redactSensitive($oldValues),
+            $this->redactSensitive($values),
         );
 
         User::role('superadmin')->each(function (User $user) use ($request): void {
@@ -115,11 +116,58 @@ class SystemSettingsController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            logger()->error('SMTP connection test failed', [
+                'error' => $e->getMessage(),
+                'user' => $request->user()?->username,
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'SMTP Test Failed: '.$e->getMessage(),
+                'message' => 'SMTP connection test failed. Check the mail configuration and try again.',
             ], 500);
         }
+    }
+
+    /**
+     * Store a branding file using an extension derived from its detected
+     * MIME type instead of the client-supplied filename.
+     */
+    private function storeBrandingFile(UploadedFile $file): string
+    {
+        $extensions = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+            'image/x-icon' => 'ico',
+        ];
+
+        $detected = (new \finfo(FILEINFO_MIME_TYPE))->file((string) $file->getRealPath());
+        $extension = $detected !== false ? ($extensions[$detected] ?? null) : null;
+
+        if ($extension === null) {
+            abort(422, 'Unsupported image type.');
+        }
+
+        return $file->storeAs('branding', uniqid('branding_').'.'.$extension, 'public');
+    }
+
+    /**
+     * Replace sensitive settings values with placeholders before persisting
+     * them to the audit log so credentials never leak through it.
+     *
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private function redactSensitive(array $values): array
+    {
+        foreach (['mail_password', 'mail_username'] as $key) {
+            if (array_key_exists($key, $values)) {
+                $values[$key] = filled($values[$key]) ? '[REDACTED]' : '';
+            }
+        }
+
+        return $values;
     }
 
     public function clearCache(Request $request): RedirectResponse

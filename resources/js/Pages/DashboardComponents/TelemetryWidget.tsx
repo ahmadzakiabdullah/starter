@@ -23,9 +23,9 @@ import { toast } from 'sonner';
 
 interface TelemetryProps {
     telemetry: {
-        cpu_percent: number;
-        ram_percent: number;
-        disk_percent: number;
+        cpu_percent: number | null;
+        ram_percent: number | null;
+        disk_percent: number | null;
         caches: {
             config: boolean;
             routes: boolean;
@@ -44,8 +44,16 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [dataHistory, setDataHistory] = useState<ChartData[]>([]);
     const { props: pageProps } = usePage();
-    const system = pageProps.system as any;
+    const system = pageProps.system as
+        | { module_telemetry?: boolean }
+        | undefined;
     const showChart = system?.module_telemetry !== false;
+
+    const telemetryUnavailable =
+        telemetry.cpu_percent === null || telemetry.cpu_percent === undefined;
+    const cpuPercent = telemetry.cpu_percent ?? 0;
+    const ramPercent = telemetry.ram_percent ?? 0;
+    const diskPercent = telemetry.disk_percent ?? 0;
 
     useEffect(() => {
         // Initialize with 10 historical points leading to the current load values
@@ -61,23 +69,17 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
             // Jitter to make historical chart lines look natural
             const cpuJitter = Math.min(
                 100,
-                Math.max(
-                    3,
-                    telemetry.cpu_percent + Math.floor(Math.random() * 16) - 8,
-                ),
+                Math.max(3, cpuPercent + Math.floor(Math.random() * 16) - 8),
             );
             const ramJitter = Math.min(
                 100,
-                Math.max(
-                    3,
-                    telemetry.ram_percent + Math.floor(Math.random() * 6) - 3,
-                ),
+                Math.max(3, ramPercent + Math.floor(Math.random() * 6) - 3),
             );
 
             return {
                 time: timeStr,
-                cpu: i === 9 ? telemetry.cpu_percent : cpuJitter,
-                ram: i === 9 ? telemetry.ram_percent : ramJitter,
+                cpu: i === 9 ? cpuPercent : cpuJitter,
+                ram: i === 9 ? ramPercent : ramJitter,
             };
         });
 
@@ -98,19 +100,12 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
                     100,
                     Math.max(
                         2,
-                        telemetry.cpu_percent +
-                            Math.floor(Math.random() * 10) -
-                            5,
+                        cpuPercent + Math.floor(Math.random() * 10) - 5,
                     ),
                 );
                 const nextRam = Math.min(
                     100,
-                    Math.max(
-                        2,
-                        telemetry.ram_percent +
-                            Math.floor(Math.random() * 4) -
-                            2,
-                    ),
+                    Math.max(2, ramPercent + Math.floor(Math.random() * 4) - 2),
                 );
 
                 return [
@@ -121,7 +116,7 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
         }, 3000);
 
         return () => clearInterval(timer);
-    }, [telemetry.cpu_percent, telemetry.ram_percent]);
+    }, [cpuPercent, ramPercent]);
 
     const handleClearCache = () => {
         setIsProcessing(true);
@@ -174,7 +169,7 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
         return 'text-rose-500';
     };
 
-    return (
+    return telemetryUnavailable ? null : (
         <Card className="bg-card/60 hover:border-primary/20 overflow-hidden rounded-xl border border-slate-200 shadow-sm backdrop-blur-md transition-all duration-300 dark:border-slate-800">
             <CardHeader className="border-b border-slate-100 pb-3 dark:border-slate-800/60">
                 <CardTitle className="flex items-center gap-2 text-sm font-bold">
@@ -303,9 +298,9 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
                                     CPU Load
                                 </span>
                                 <span
-                                    className={`font-mono font-bold ${getProgressColorText(telemetry.cpu_percent)}`}
+                                    className={`font-mono font-bold ${getProgressColorText(cpuPercent)}`}
                                 >
-                                    {telemetry.cpu_percent}%
+                                    {cpuPercent}%
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
@@ -314,9 +309,9 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
                                     Memory
                                 </span>
                                 <span
-                                    className={`font-mono font-bold ${getProgressColorText(telemetry.ram_percent)}`}
+                                    className={`font-mono font-bold ${getProgressColorText(ramPercent)}`}
                                 >
-                                    {telemetry.ram_percent}%
+                                    {ramPercent}%
                                 </span>
                             </div>
                         </div>
@@ -330,16 +325,16 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
                                         CPU Load
                                     </span>
                                     <span
-                                        className={`font-mono font-semibold ${getProgressColorText(telemetry.cpu_percent)}`}
+                                        className={`font-mono font-semibold ${getProgressColorText(cpuPercent)}`}
                                     >
-                                        {telemetry.cpu_percent}%
+                                        {cpuPercent}%
                                     </span>
                                 </div>
                                 <div className="bg-muted/60 h-1.5 w-full overflow-hidden rounded-full">
                                     <div
                                         className={`h-full bg-indigo-600 transition-all duration-500 ease-out`}
                                         style={{
-                                            width: `${telemetry.cpu_percent}%`,
+                                            width: `${cpuPercent}%`,
                                         }}
                                     />
                                 </div>
@@ -353,16 +348,16 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
                                         Memory Load
                                     </span>
                                     <span
-                                        className={`font-mono font-semibold ${getProgressColorText(telemetry.ram_percent)}`}
+                                        className={`font-mono font-semibold ${getProgressColorText(ramPercent)}`}
                                     >
-                                        {telemetry.ram_percent}%
+                                        {ramPercent}%
                                     </span>
                                 </div>
                                 <div className="bg-muted/60 h-1.5 w-full overflow-hidden rounded-full">
                                     <div
                                         className={`h-full bg-emerald-500 transition-all duration-500 ease-out`}
                                         style={{
-                                            width: `${telemetry.ram_percent}%`,
+                                            width: `${ramPercent}%`,
                                         }}
                                     />
                                 </div>
@@ -378,15 +373,15 @@ export default function TelemetryWidget({ telemetry }: TelemetryProps) {
                                 Storage Size
                             </span>
                             <span
-                                className={`font-mono font-semibold ${getProgressColorText(telemetry.disk_percent)}`}
+                                className={`font-mono font-semibold ${getProgressColorText(diskPercent)}`}
                             >
-                                {telemetry.disk_percent}%
+                                {diskPercent}%
                             </span>
                         </div>
                         <div className="bg-muted/60 h-1.5 w-full overflow-hidden rounded-full">
                             <div
-                                className={`h-full ${getProgressColor(telemetry.disk_percent)} transition-all duration-500 ease-out`}
-                                style={{ width: `${telemetry.disk_percent}%` }}
+                                className={`h-full ${getProgressColor(diskPercent)} transition-all duration-500 ease-out`}
+                                style={{ width: `${diskPercent}%` }}
                             />
                         </div>
                     </div>

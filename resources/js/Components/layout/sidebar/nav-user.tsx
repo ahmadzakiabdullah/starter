@@ -27,8 +27,8 @@ import {
 
 export function NavUser() {
     const { isMobile } = useSidebar();
-    const { auth } = usePage().props as any;
-    const user = auth.user;
+    const { auth } = usePage().props;
+    const user = auth.user!;
 
     return (
         <SidebarMenu>

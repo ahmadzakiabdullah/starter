@@ -3,9 +3,9 @@ import { Bell, Database, Key, Users } from 'lucide-react';
 
 interface StatsProps {
     stats: {
-        total_users: number;
-        total_roles: number;
-        total_backups: number;
+        total_users: number | null;
+        total_roles: number | null;
+        total_backups: number | null;
         unread_notifications: number;
     };
 }
@@ -65,7 +65,7 @@ export default function AdminStatsGrid({ stats }: StatsProps) {
                                 {card.title}
                             </span>
                             <span className="text-foreground mt-1 block text-xl leading-none font-bold tracking-tight sm:text-2xl">
-                                {card.value}
+                                {card.value ?? '—'}
                             </span>
                             <span className="text-muted-foreground block truncate text-[10px]">
                                 {card.description}

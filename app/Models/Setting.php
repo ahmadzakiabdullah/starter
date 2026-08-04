@@ -22,6 +22,25 @@ class Setting extends Model
      */
     private static array $encrypted = ['mail_password', 'mail_username'];
 
+    /**
+     * Settings keys safe to share with every visitor via shared Inertia props.
+     * Never include mail credentials, maintenance bypass IPs, or other secrets.
+     */
+    private static array $public = [
+        'app_name',
+        'app_description',
+        'app_logo_type',
+        'app_logo_icon',
+        'app_logo_image',
+        'app_favicon',
+        'module_notifications',
+        'module_active_sessions',
+        'module_theme_presets',
+        'module_announcements',
+        'module_telemetry',
+        'module_api_keys',
+    ];
+
     public static function defaults(): array
     {
         return [
@@ -63,6 +82,9 @@ class Setting extends Model
     /**
      * Get all settings values with caching (60 second TTL).
      * Called on every request by middleware — cache prevents repeated DB queries.
+     *
+     * Sensitive values are cached in their ENCRYPTED form; decryption happens
+     * on every read so plaintext credentials never touch the cache backend.
      */
     public static function values(): array
     {
@@ -70,30 +92,41 @@ class Setting extends Model
             return static::defaults();
         }
 
-        return Cache::remember(static::$cacheKey, 60, function () {
-            $values = static::defaults();
-
-            $booleans = [
-                'email_notifications', 'enable_registration', 'maintenance_mode',
-                'module_notifications', 'module_active_sessions', 'module_theme_presets',
-                'module_announcements', 'module_telemetry', 'module_api_keys',
-            ];
-            $integers = ['min_password_length', 'session_lifetime'];
-
-            foreach (static::query()->pluck('value', 'key') as $key => $value) {
-                if (in_array($key, $booleans)) {
-                    $values[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                } elseif (in_array($key, $integers)) {
-                    $values[$key] = (int) $value;
-                } elseif (in_array($key, static::$encrypted)) {
-                    $values[$key] = static::decryptValue($value);
-                } else {
-                    $values[$key] = $value;
-                }
-            }
-
-            return $values;
+        $raw = Cache::remember(static::$cacheKey, 60, function () {
+            return static::query()->pluck('value', 'key')->all();
         });
+
+        $values = static::defaults();
+
+        $booleans = [
+            'email_notifications', 'enable_registration', 'maintenance_mode',
+            'module_notifications', 'module_active_sessions', 'module_theme_presets',
+            'module_announcements', 'module_telemetry', 'module_api_keys',
+        ];
+        $integers = ['min_password_length', 'session_lifetime'];
+
+        foreach ($raw as $key => $value) {
+            if (in_array($key, $booleans)) {
+                $values[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (in_array($key, $integers)) {
+                $values[$key] = (int) $value;
+            } elseif (in_array($key, static::$encrypted)) {
+                $values[$key] = static::decryptValue($value);
+            } else {
+                $values[$key] = $value;
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Get only the non-sensitive settings that are safe to share publicly
+     * (e.g. via shared Inertia props rendered on every page).
+     */
+    public static function publicValues(): array
+    {
+        return array_intersect_key(static::values(), array_flip(self::$public));
     }
 
     /**

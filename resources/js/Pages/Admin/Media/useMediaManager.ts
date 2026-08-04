@@ -8,10 +8,7 @@ interface UseMediaManagerProps {
     folders: string[];
 }
 
-export function useMediaManager({
-    initialFilters,
-    folders: _folders,
-}: UseMediaManagerProps) {
+export function useMediaManager({ initialFilters }: UseMediaManagerProps) {
     const [search, setSearch] = useState(initialFilters.search || '');
     const [activeFolder, setActiveFolder] = useState<string | null>(
         initialFilters.folder || null,

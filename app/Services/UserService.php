@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\AccountAccessChanged;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -41,61 +42,89 @@ class UserService
 
     public function create(array $data, User $actor): User
     {
-        $avatar = $this->storeAvatar($data['avatar'] ?? null);
-        $user = User::create([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'avatar' => $avatar,
-            'email_verified_at' => filter_var($data['email_verified'], FILTER_VALIDATE_BOOLEAN) ? now() : null,
-        ]);
+        return DB::transaction(function () use ($data, $actor) {
+            $avatar = $this->storeAvatar($data['avatar'] ?? null);
 
-        $user->syncRoles($data['roles']);
-        $user->notify(new AccountAccessChanged('Your account has been created.'));
-        $this->audit->record($actor, 'user.created', $user, "Created user {$user->username}.", [], $this->auditValues($user));
+            try {
+                $user = User::create([
+                    'name' => $data['name'],
+                    'username' => $data['username'],
+                    'email' => $data['email'],
+                    'password' => Hash::make($data['password']),
+                    'avatar' => $avatar,
+                    'email_verified_at' => filter_var($data['email_verified'], FILTER_VALIDATE_BOOLEAN) ? now() : null,
+                ]);
 
-        return $user;
+                $user->syncRoles($data['roles']);
+                $user->notify(new AccountAccessChanged('Your account has been created.'));
+                $this->audit->record($actor, 'user.created', $user, "Created user {$user->username}.", [], $this->auditValues($user));
+
+                return $user;
+            } catch (\Throwable $e) {
+                if ($avatar !== null) {
+                    $this->deleteAvatar($avatar);
+                }
+
+                throw $e;
+            }
+        });
     }
 
     public function update(User $user, array $data, User $actor): User
     {
-        $oldValues = $this->auditValues($user);
+        return DB::transaction(function () use ($user, $data, $actor) {
+            $oldValues = $this->auditValues($user);
+            $oldAvatar = null;
+            $newAvatar = null;
 
-        if (! empty($data['remove_avatar']) && $user->avatar) {
-            $this->deleteAvatar($user->avatar);
-            $user->avatar = null;
-        }
-
-        if (! empty($data['avatar'])) {
-            if ($user->avatar) {
-                $this->deleteAvatar($user->avatar);
+            if (! empty($data['remove_avatar']) && $user->avatar) {
+                $oldAvatar = $user->avatar;
+                $user->avatar = null;
             }
-            $user->avatar = $this->storeAvatar($data['avatar']);
-        }
 
-        $user->fill([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'email' => $data['email'],
-        ]);
+            if (! empty($data['avatar'])) {
+                $oldAvatar = $user->avatar;
+                $newAvatar = $this->storeAvatar($data['avatar']);
+                $user->avatar = $newAvatar;
+            }
 
-        if (! $user->is($actor)) {
-            $user->email_verified_at = filter_var($data['email_verified'], FILTER_VALIDATE_BOOLEAN)
-                ? ($user->email_verified_at ?? now())
-                : null;
-        }
+            $user->fill([
+                'name' => $data['name'],
+                'username' => $data['username'],
+                'email' => $data['email'],
+            ]);
 
-        if (! empty($data['password'])) {
-            $user->password = Hash::make($data['password']);
-        }
+            if (! $user->is($actor)) {
+                $user->email_verified_at = filter_var($data['email_verified'], FILTER_VALIDATE_BOOLEAN)
+                    ? ($user->email_verified_at ?? now())
+                    : null;
+            }
 
-        $user->save();
-        $user->syncRoles($data['roles']);
-        $user->notify(new AccountAccessChanged('Your account details or assigned roles were updated.'));
-        $this->audit->record($actor, 'user.updated', $user, "Updated user {$user->username}.", $oldValues, $this->auditValues($user));
+            if (! empty($data['password'])) {
+                $user->password = Hash::make($data['password']);
+            }
 
-        return $user;
+            try {
+                $user->save();
+            } catch (\Throwable $e) {
+                if ($newAvatar !== null) {
+                    $this->deleteAvatar($newAvatar);
+                }
+
+                throw $e;
+            }
+
+            // Only remove the previous avatar once the new state is persisted.
+            if ($oldAvatar !== null && $oldAvatar !== $newAvatar) {
+                $this->deleteAvatar($oldAvatar);
+            }
+
+            $user->syncRoles($data['roles']);
+            $user->notify(new AccountAccessChanged('Your account details or assigned roles were updated.'));
+            $this->audit->record($actor, 'user.updated', $user, "Updated user {$user->username}.", $oldValues, $this->auditValues($user));
+
+            return $user;
+        });
     }
 
     public function delete(User $user, User $actor, bool $bulk = false): void
@@ -128,7 +157,20 @@ class UserService
             return null;
         }
 
-        return Storage::url($avatar->store('avatars', 'public'));
+        $detected = (new \finfo(FILEINFO_MIME_TYPE))->file((string) $avatar->getRealPath());
+        $extensions = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+        ];
+        $extension = $detected !== false ? ($extensions[$detected] ?? null) : null;
+
+        if ($extension === null) {
+            abort(422, 'Unsupported image type.');
+        }
+
+        return Storage::url($avatar->storeAs('avatars', uniqid('avatar_').'.'.$extension, 'public'));
     }
 
     private function deleteAvatar(string $avatar): void

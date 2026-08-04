@@ -22,7 +22,13 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        // Trust proxies only when explicitly configured via TRUST_PROXIES
+        // (comma-separated IPs/CIDRs, e.g. "127.0.0.1,10.0.0.0/8"). When
+        // empty, X-Forwarded-For headers are ignored so client IPs cannot
+        // be spoofed (e.g. to bypass the maintenance mode IP allowlist).
+        $middleware->trustProxies(
+            at: array_values(array_filter(array_map('trim', explode(',', (string) env('TRUST_PROXIES', '')))))
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

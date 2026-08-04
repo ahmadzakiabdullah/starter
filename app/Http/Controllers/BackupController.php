@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BackupController extends Controller
 {
@@ -36,15 +36,15 @@ class BackupController extends Controller
     {
         Gate::authorize('manage-system');
 
-        CreateBackupJob::dispatch($request->user());
+        CreateBackupJob::dispatch($request->user()->id);
 
         return back()->with('success', 'Database backup has been queued for creation.');
     }
 
     /**
-     * Download a specific backup file.
+     * Download a specific backup file (decrypted on the fly).
      */
-    public function download(Request $request, string $filename): BinaryFileResponse|RedirectResponse
+    public function download(Request $request, string $filename): StreamedResponse|RedirectResponse
     {
         Gate::authorize('manage-system');
 
@@ -54,7 +54,15 @@ class BackupController extends Controller
             return back()->with('error', 'File not found or invalid filename.');
         }
 
-        return response()->download($filePath);
+        $downloadName = str_replace('.enc', '.sql', $filename);
+
+        return response()->streamDownload(
+            function () use ($filePath): void {
+                $this->backups->streamDecrypted($filePath);
+            },
+            $downloadName,
+            ['Content-Type' => 'application/sql; charset=utf-8']
+        );
     }
 
     /**

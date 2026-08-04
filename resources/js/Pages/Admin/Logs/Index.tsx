@@ -32,7 +32,7 @@ interface LogsPageProps {
 }
 
 export default function Index({ logs, logSize }: LogsPageProps) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props;
     const [expandedLog, setExpandedLog] = useState<number | null>(null);
     const [levelFilter, setLevelFilter] = useState<string>('all');
 

@@ -124,6 +124,8 @@ function TimelineIndicator({
     children,
     ...props
 }: TimelineIndicatorProps) {
+    void asChild;
+
     return (
         <div
             data-slot="timeline-indicator"

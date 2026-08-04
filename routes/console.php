@@ -28,6 +28,6 @@ Artisan::command('backup:run', function () {
     } catch (Exception $e) {
         $this->error("Backup failed: {$e->getMessage()}");
     }
-})->purpose('Create a database backup')->daily();
+})->purpose('Create a database backup');
 
 Schedule::command('backup:run')->daily()->at('02:00');

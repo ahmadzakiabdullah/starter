@@ -9,13 +9,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { DEFAULT_THEME, THEMES } from '@/lib/themes';
+import { DEFAULT_THEME, THEMES, type ThemeType } from '@/lib/themes';
 
 export function PresetSelector() {
     const { theme, setTheme } = useThemeConfig();
 
     const handlePreset = (value: string) => {
-        setTheme({ ...theme, ...DEFAULT_THEME, preset: value as any });
+        setTheme({
+            ...theme,
+            ...DEFAULT_THEME,
+            preset: value as ThemeType['preset'],
+        });
     };
 
     return (

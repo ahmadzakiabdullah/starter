@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\TelemetryService;
 use Illuminate\Http\Request;
@@ -21,14 +22,23 @@ class DashboardController extends Controller
      */
     public function index(Request $request): Response
     {
-        $stats = $this->getAdminStats($request);
-        $recentActivity = $this->getRecentActivity();
-        $metrics = $this->telemetry->getMetrics();
+        $isStaff = $request->user()->hasAnyRole(['superadmin', 'admin', 'manager']);
+        $moduleTelemetry = Setting::values()['module_telemetry'] ?? true;
 
-        return Inertia::render('Dashboard', [
-            'stats' => $stats,
-            'recentActivity' => $recentActivity,
-            'telemetry' => [
+        $stats = [
+            'total_users' => $isStaff ? User::count() : null,
+            'total_roles' => $isStaff ? Role::count() : null,
+            'total_backups' => $isStaff ? $this->countBackups() : null,
+            'unread_notifications' => $request->user()->unreadNotifications()->count(),
+        ];
+
+        $recentActivity = $isStaff ? $this->getRecentActivity() : [];
+
+        $telemetry = ['cpu_percent' => null, 'ram_percent' => null, 'disk_percent' => null, 'caches' => ['config' => false, 'routes' => false, 'debug' => false]];
+
+        if ($isStaff && $moduleTelemetry) {
+            $metrics = $this->telemetry->getMetrics();
+            $telemetry = [
                 'cpu_percent' => $metrics['cpu_percent'],
                 'ram_percent' => $metrics['ram']['percent'],
                 'disk_percent' => $metrics['disk']['percent'],
@@ -37,27 +47,28 @@ class DashboardController extends Controller
                     'routes' => app()->routesAreCached(),
                     'debug' => config('app.debug', false),
                 ],
-            ],
+            ];
+        }
+
+        return Inertia::render('Dashboard', [
+            'stats' => $stats,
+            'recentActivity' => $recentActivity,
+            'telemetry' => $telemetry,
         ]);
     }
 
     /**
-     * Gather system wide statistics.
+     * Count the backup archives on disk.
      */
-    private function getAdminStats(Request $request): array
+    private function countBackups(): int
     {
         $backupDir = storage_path('app/backups');
-        $backupsCount = 0;
-        if (file_exists($backupDir)) {
-            $backupsCount = count(glob($backupDir.'/*.{sql,sqlite}', GLOB_BRACE));
+
+        if (! file_exists($backupDir)) {
+            return 0;
         }
 
-        return [
-            'total_users' => User::count(),
-            'total_roles' => Role::count(),
-            'total_backups' => $backupsCount,
-            'unread_notifications' => $request->user()->unreadNotifications()->count(),
-        ];
+        return count(glob($backupDir.'/*.{sql,sqlite}', GLOB_BRACE));
     }
 
     /**

@@ -82,8 +82,8 @@ interface UsersProps {
 }
 
 export default function Index({ users, roles, stats, filters }: UsersProps) {
-    const { auth, flash } = usePage().props as any;
-    const currentUser = auth.user;
+    const { auth, flash } = usePage().props;
+    const currentUser = auth.user!;
 
     const [search, setSearch] = useState(
         typeof filters?.search === 'string' ? filters.search : '',

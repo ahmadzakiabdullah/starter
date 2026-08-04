@@ -7,10 +7,19 @@ import {
     DialogTitle,
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as Lucide from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
+interface MediaFile {
+    id: number;
+    name: string;
+    url: string;
+    mime_type: string;
+    formatted_size: string;
+    folder: string | null;
+}
 
 interface MediaSelectorProps {
     open: boolean;
@@ -25,19 +34,22 @@ export default function MediaSelector({
     onSelect,
     allowedTypes = 'all',
 }: MediaSelectorProps) {
-    const [files, setFiles] = useState<any[]>([]);
+    const [files, setFiles] = useState<MediaFile[]>([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
-    const [selectedFile, setSelectedFile] = useState<any | null>(null);
+    const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
     const [uploading, setUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
 
     const fetchFiles = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('/dashboard/media', {
-                headers: { Accept: 'application/json' },
-            });
+            const response = await axios.get<{ files: MediaFile[] }>(
+                '/dashboard/media',
+                {
+                    headers: { Accept: 'application/json' },
+                },
+            );
             setFiles(response.data.files || []);
         } catch (error) {
             toast.error('Failed to load media assets.');
@@ -72,20 +84,18 @@ export default function MediaSelector({
         formData.append('folder', 'branding'); // Default folder inside modal uploads
 
         try {
-            const response = await axios.post(
-                '/dashboard/media/upload',
-                formData,
-                {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                },
-            );
+            await axios.post('/dashboard/media/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             toast.success('Asset uploaded successfully.');
             // Refresh file list
             await fetchFiles();
-        } catch (error: any) {
+        } catch (error: unknown) {
             const errMsg =
-                error.response?.data?.message || 'Failed to upload asset.';
-            toast.error(errMsg);
+                error instanceof AxiosError
+                    ? error.response?.data?.message
+                    : undefined;
+            toast.error(errMsg || 'Failed to upload asset.');
         } finally {
             setUploading(false);
         }

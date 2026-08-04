@@ -77,45 +77,51 @@ export default function CalendarDateRangePicker({
             case 'today':
                 handleQuickSelect(startOfDay(today), endOfDay(today));
                 break;
-            case 'yesterday':
+            case 'yesterday': {
                 const yesterday = subDays(today, 1);
                 handleQuickSelect(startOfDay(yesterday), endOfDay(yesterday));
                 break;
-            case 'thisWeek':
+            }
+            case 'thisWeek': {
                 const startOfCurrentWeek = startOfWeek(today);
                 handleQuickSelect(
                     startOfDay(startOfCurrentWeek),
                     endOfDay(today),
                 );
                 break;
-            case 'last7Days':
+            }
+            case 'last7Days': {
                 const sevenDaysAgo = subDays(today, 6);
                 handleQuickSelect(startOfDay(sevenDaysAgo), endOfDay(today));
                 break;
-            case 'last28Days':
+            }
+            case 'last28Days': {
                 const twentyEightDaysAgo = subDays(today, 27); // 27 days ago + today = 28 days
                 handleQuickSelect(
                     startOfDay(twentyEightDaysAgo),
                     endOfDay(today),
                 );
                 break;
+            }
             case 'thisMonth':
                 handleQuickSelect(startOfMonth(today), endOfDay(today));
                 break;
-            case 'lastMonth':
+            case 'lastMonth': {
                 const lastMonth = subMonths(today, 1);
                 handleQuickSelect(
                     startOfMonth(lastMonth),
                     endOfMonth(lastMonth),
                 );
                 break;
-            case 'thisYear':
+            }
+            case 'thisYear': {
                 const startOfCurrentYear = startOfYear(today);
                 handleQuickSelect(
                     startOfDay(startOfCurrentYear),
                     endOfDay(today),
                 );
                 break;
+            }
         }
     };
 

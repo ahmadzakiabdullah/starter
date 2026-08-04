@@ -35,7 +35,7 @@ interface NotificationsProps {
 }
 
 export default function Index({ notifications }: NotificationsProps) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props;
     const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
 
     useEffect(() => {

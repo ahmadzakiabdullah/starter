@@ -14,6 +14,46 @@ use Spatie\Permission\Models\Role;
 class RoleController extends Controller
 {
     /**
+     * Permissions that grant administrative powers. Only the superadmin
+     * may assign or remove them.
+     */
+    private const PRIVILEGED_PERMISSIONS = [
+        'manage-users',
+        'manage-roles',
+        'manage-settings',
+        'manage-system',
+        'manage-announcements',
+        'manage-changelog',
+        'manage-media',
+    ];
+
+    /**
+     * Determine whether the current user may modify the given role with the
+     * given permission list. Non-superadmins are blocked from touching
+     * privileged roles or granting privileged permissions.
+     *
+     * @param  array<int, string>  $permissions
+     */
+    private function canManageRole(Role $role, array $permissions): bool
+    {
+        if (auth()->user()?->hasRole('superadmin')) {
+            return true;
+        }
+
+        if (in_array($role->name, ['superadmin', 'admin', 'user'], true)) {
+            return false;
+        }
+
+        if (count(array_intersect($permissions, self::PRIVILEGED_PERMISSIONS)) > 0) {
+            return false;
+        }
+
+        $current = $role->getPermissionNames()->all();
+
+        return count(array_intersect($current, self::PRIVILEGED_PERMISSIONS)) === 0;
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -36,13 +76,19 @@ class RoleController extends Controller
     {
         Gate::authorize('manage-roles');
 
+        $permissions = $request->input('permissions', []);
+
+        if (! $this->canManageRole(new Role(['name' => $request->name]), $permissions)) {
+            return redirect()->back()->with('error', 'You are not allowed to create a role with administrative permissions.');
+        }
+
         $role = Role::create([
             'name' => strtolower($request->name),
             'guard_name' => 'web',
         ]);
 
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+        if (filled($permissions)) {
+            $role->syncPermissions($permissions);
         }
 
         AuditLog::record(
@@ -69,6 +115,12 @@ class RoleController extends Controller
             'permissions' => $role->getPermissionNames()->all(),
         ];
 
+        $permissions = $request->input('permissions', []);
+
+        if (! $this->canManageRole($role, $permissions)) {
+            return redirect()->back()->with('error', 'You are not allowed to modify this role or its permissions.');
+        }
+
         // Prevent modifying the superadmin role name to prevent breaking the system.
         if ($role->name !== 'superadmin') {
             $role->name = strtolower($request->name);
@@ -76,8 +128,8 @@ class RoleController extends Controller
 
         $role->save();
 
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+        if (filled($permissions)) {
+            $role->syncPermissions($permissions);
         }
 
         AuditLog::record(
